@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design System Manager</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #FEF7FF;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #74009F;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-badge {
+            padding: 4px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        /* Auth Styles */
+        .auth-container {
+            background: white;
+            border-radius: 8px;
+            padding: 40px;
+            max-width: 400px;
+            margin: 100px auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .auth-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: #74009F;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Layout */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+        }
+
+        .filter-select {
+            min-width: 120px;
+        }
+
+        /* Items */
+        .items-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .item {
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .item-category {
+            background: #e2e8f0;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #4a5568;
+        }
+
+        .item-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .item-value {
+            background: #f1f5f9;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-draft { background: #fed7d7; color: #c53030; }
+        .status-review { background: #bee3f8; color: #3182ce; }
+        .status-approved { background: #c6f6d5; color: #38a169; }
+        .status-deprecated { background: #fbb6ce; color: #d53f8c; }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        /* Messages */
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .success {
+            background: #c6f6d5;
+            color: #38a169;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .auth-toggle a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-toggle a:hover {
+            text-decoration: underline;
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Auth Screen -->
+        <div id="authScreen">
+            <div class="auth-container">
+                <h2 id="authTitle">Login</h2>
+                <div id="authError" class="error" style="display: none;"></div>
+                <form id="authForm">
+                    <div class="form-group" id="usernameGroup" style="display: none;">
+                        <label>Username</label>
+                        <input type="text" id="username" placeholder="Your username">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="password" placeholder="Your password" required>
+                    </div>
+                    <div class="form-group" id="roleGroup" style="display: none;">
+                        <label>Role</label>
+                        <select id="role">
+                            <option value="designer">Designer</option>
+                            <option value="developer">Developer</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <button type="submit" id="authSubmit" style="width: 100%;">Login</button>
+                    <div class="auth-toggle">
+                        <span id="authToggleText">Don't have an account?</span>
+                        <a href="#" id="authToggle">Register here</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Main App -->
+        <div id="mainApp" style="display: none;">
+            <div class="container">
+                <div class="header">
+                    <div class="logo">Design System Manager</div>
+                    <div class="user-info">
+                        <span id="userName"></span>
+                        <span id="userRole" class="user-badge"></span>
+                        <button onclick="logout()" class="btn-secondary">Logout</button>
+                    </div>
+                </div>
+
+                <div class="dashboard">
+                    <!-- Tokens Section -->
+                    <div class="section">
+                        <div class="section-header">
+                            <h2>Design Tokens</h2>
+                            <div style="display: flex; gap: 10px;">
+                                <button onclick="openTokenModal()">+ Add Token</button>
+                                <button onclick="openUploadModal()" class="btn-secondary">📤 Upload JSON</button>
+                            </div>
+                        </div>
+                        
+                        <div class="controls">
+                            <input type="text" id="tokenSearch" class="search-input" placeholder="Search tokens..." onkeyup="searchTokens()">
+                            <select id="tokenCategoryFilter" class="filter-select" onchange="filterTokens()">
+                                <option value="">All</option>
+                                <option value="color">Color</option>
+                                <option value="typography">Typography</option>
+                                <option value="spacing">Spacing</option>
+                            </select>
+                        </div>
+
+                        <div id="tokensList" class="items-list">
+                            <div class="loading">Loading...</div>
+                        </div>
+                    </div>
+
+                    <!-- Components Section -->
+                    <div class="section">
+                        <div class="section-header">
+                            <h2>Components</h2>
+                            <button onclick="openComponentModal()">+ Add Component</button>
+                        </div>
+                        
+                        <div class="controls">
+                            <input type="text" id="componentSearch" class="search-input" placeholder="Search components..." onkeyup="searchComponents()">
+                            <select id="componentStatusFilter" class="filter-select" onchange="filterComponents()">
+                                <option value="">All Status</option>
+                                <option value="draft">Draft</option>
+                                <option value="review">Review</option>
+                                <option value="approved">Approved</option>
+                            </select>
+                        </div>
+
+                        <div id="componentsList" class="items-list">
+                            <div class="loading">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simple Token Modal -->
+        <div id="tokenModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="tokenModalTitle">Add Token</h3>
+                    <button class="close-btn" onclick="closeTokenModal()">&times;</button>
+                </div>
+                <div id="tokenError" class="error" style="display: none;"></div>
+                <form id="tokenForm">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="tokenName" placeholder="primary-blue" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="tokenCategory" required>
+                            <option value="">Select category</option>
+                            <option value="color">Color</option>
+                            <option value="typography">Typography</option>
+                            <option value="spacing">Spacing</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Value</label>
+                        <input type="text" id="tokenValue" placeholder="#3B82F6" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="tokenDescription" placeholder="Primary brand color">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" class="btn-secondary" onclick="closeTokenModal()">Cancel</button>
+                        <button type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Upload Modal -->
+        <div id="uploadModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Upload Design Tokens from JSON</h3>
+                    <button class="close-btn" onclick="closeUploadModal()">&times;</button>
+                </div>
+                <div id="uploadError" class="error" style="display: none;"></div>
+                <div id="uploadSuccess" class="success" style="display: none;"></div>
+                
+                <div class="form-group">
+                    <label>JSON File</label>
+                    <input type="file" id="jsonFileInput" accept=".json" style="width: 100%; padding: 10px; border: 2px dashed #ddd; border-radius: 4px;">
+                    <small style="color: #666; margin-top: 5px; display: block;">
+                        Select a JSON file containing your design tokens
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label>Expected JSON Format:</label>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; font-size: 12px; overflow-x: auto;">
+{
+  "tokens": [
+    {
+      "name": "primary-blue",
+      "category": "color",
+      "value": "#3B82F6",
+      "description": "Primary brand color",
+      "tags": ["primary", "brand"]
+    },
+    {
+      "name": "font-size-lg",
+      "category": "typography",
+      "value": "18px",
+      "description": "Large font size"
+    }
+  ]
+}</pre>
+                </div>
+
+                <div id="uploadPreview" style="display: none;">
+                    <h4>Preview (first 5 tokens):</h4>
+                    <div id="previewContent" style="background: #f9f9f9; padding: 10px; border-radius: 4px; max-height: 200px; overflow-y: auto;">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn-secondary" onclick="closeUploadModal()">Cancel</button>
+                    <button type="button" id="uploadBtn" onclick="uploadTokens()" disabled>Upload Tokens</button>
+                </div>
+            </div>
+        </div>
+        <div id="componentModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="componentModalTitle">Add Component</h3>
+                    <button class="close-btn" onclick="closeComponentModal()">&times;</button>
+                </div>
+                <div id="componentError" class="error" style="display: none;"></div>
+                <form id="componentForm">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="componentName" placeholder="Primary Button" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="componentCategory" required>
+                            <option value="">Select category</option>
+                            <option value="button">Button</option>
+                            <option value="input">Input</option>
+                            <option value="card">Card</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="componentDescription" placeholder="Main action button" rows="2" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>HTML Code</label>
+                        <textarea id="componentHtml" placeholder="<button class='btn-primary'>Click me</button>" rows="3"></textarea>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" class="btn-secondary" onclick="closeComponentModal()">Cancel</button>
+                        <button type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple global state
+        let currentUser = null;
+        let authToken = localStorage.getItem('authToken');
+        let isLoginMode = true;
+        let tokens = [];
+        let components = [];
+
+        let selectedTokensData = null;
+
+        // Setup
+        if (authToken) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            if (authToken) {
+                showMainApp();
+                loadData();
+            } else {
+                showAuthScreen();
+            }
+        });
+
+        function setupEventListeners() {
+            document.getElementById('authForm').addEventListener('submit', handleAuth);
+            document.getElementById('authToggle').addEventListener('click', toggleAuthMode);
+            document.getElementById('tokenForm').addEventListener('submit', handleTokenSubmit);
+            document.getElementById('componentForm').addEventListener('submit', handleComponentSubmit);
+            
+            // File upload listener
+            document.getElementById('jsonFileInput').addEventListener('change', handleFileSelect);
+        }
+
+        // Auth functions
+        function toggleAuthMode(e) {
+            e.preventDefault();
+            isLoginMode = !isLoginMode;
+            
+            document.getElementById('authTitle').textContent = isLoginMode ? 'Login' : 'Register';
+            document.getElementById('authSubmit').textContent = isLoginMode ? 'Login' : 'Register';
+            document.getElementById('authToggleText').textContent = isLoginMode ? "Don't have an account?" : 'Already have an account?';
+            document.getElementById('authToggle').textContent = isLoginMode ? 'Register here' : 'Login here';
+            document.getElementById('usernameGroup').style.display = isLoginMode ? 'none' : 'block';
+            document.getElementById('roleGroup').style.display = isLoginMode ? 'none' : 'block';
+        }
+
+        async function handleAuth(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value;
+            const role = document.getElementById('role').value;
+            
+            const endpoint = isLoginMode ? '/api/auth/login' : '/api/auth/register';
+            const data = isLoginMode ? { email, password } : { username, email, password, role };
+            
+            try {
+                hideError('authError');
+                const response = await axios.post(endpoint, data);
+                
+                authToken = response.data.token;
+                currentUser = response.data.user;
+                
+                localStorage.setItem('authToken', authToken);
+                axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
+                
+                showMainApp();
+                loadData();
+            } catch (error) {
+                showError('authError', error.response?.data?.error || 'Authentication failed');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('authToken');
+            delete axios.defaults.headers.common['Authorization'];
+            authToken = null;
+            currentUser = null;
+            showAuthScreen();
+        }
+
+        // UI functions
+        function showAuthScreen() {
+            document.getElementById('authScreen').style.display = 'block';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+
+        function showMainApp() {
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            
+            if (currentUser) {
+                document.getElementById('userName').textContent = currentUser.username;
+                document.getElementById('userRole').textContent = currentUser.role;
+            }
+        }
+
+        function showError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+
+        function hideError(elementId) {
+            document.getElementById(elementId).style.display = 'none';
+        }
+
+        // Data loading
+        async function loadData() {
+            await Promise.all([loadTokens(), loadComponents()]);
+        }
+
+        async function loadTokens() {
+            try {
+                const response = await axios.get('/api/tokens');
+                tokens = response.data.tokens;
+                renderTokens(tokens);
+            } catch (error) {
+                document.getElementById('tokensList').innerHTML = '<div class="error">Failed to load tokens</div>';
+            }
+        }
+
+        async function loadComponents() {
+            try {
+                const response = await axios.get('/api/components');
+                components = response.data.components;
+                renderComponents(components);
+            } catch (error) {
+                document.getElementById('componentsList').innerHTML = '<div class="error">Failed to load components</div>';
+            }
+        }
+
+        // Rendering
+        function renderTokens(tokensToRender) {
+            const container = document.getElementById('tokensList');
+            
+            if (tokensToRender.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">No tokens found</div>';
+                return;
+            }
+            
+            container.innerHTML = tokensToRender.map(token => `
+                <div class="item">
+                    <div class="item-header">
+                        <span class="item-name">${token.name}</span>
+                        <span class="item-category">${token.category}</span>
+                    </div>
+                    <div class="item-value">${token.value}</div>
+                    ${token.description ? `<div class="item-description">${token.description}</div>` : ''}
+                    <div class="item-actions">
+                        <button onclick="editToken('${token._id}')" class="btn-secondary btn-small">Edit</button>
+                        <button onclick="deleteToken('${token._id}')" class="btn-danger btn-small">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderComponents(componentsToRender) {
+            const container = document.getElementById('componentsList');
+            
+            if (componentsToRender.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">No components found</div>';
+                return;
+            }
+            
+            container.innerHTML = componentsToRender.map(component => `
+                <div class="item">
+                    <div class="item-header">
+                        <span class="item-name">${component.name}</span>
+                        <span class="status-badge status-${component.status}">${component.status}</span>
+                    </div>
+                    <div class="item-description">${component.description}</div>
+                    <div class="item-actions">
+                        <button onclick="editComponent('${component._id}')" class="btn-secondary btn-small">Edit</button>
+                        ${currentUser?.role === 'admin' ? `<button onclick="deleteComponent('${component._id}')" class="btn-danger btn-small">Delete</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Search and filter
+        function searchTokens() {
+            const search = document.getElementById('tokenSearch').value.toLowerCase();
+            const category = document.getElementById('tokenCategoryFilter').value;
+            
+            const filtered = tokens.filter(token => {
+                const matchesSearch = token.name.toLowerCase().includes(search) || 
+                                    (token.description && token.description.toLowerCase().includes(search));
+                const matchesCategory = !category || token.category === category;
+                return matchesSearch && matchesCategory;
+            });
+            
+            renderTokens(filtered);
+        }
+
+        function filterTokens() {
+            searchTokens();
+        }
+
+        function searchComponents() {
+            const search = document.getElementById('componentSearch').value.toLowerCase();
+            const status = document.getElementById('componentStatusFilter').value;
+            
+            const filtered = components.filter(component => {
+                const matchesSearch = component.name.toLowerCase().includes(search) || 
+                                    component.description.toLowerCase().includes(search);
+                const matchesStatus = !status || component.status === status;
+                return matchesSearch && matchesStatus;
+            });
+            
+            renderComponents(filtered);
+        }
+
+        function filterComponents() {
+            searchComponents();
+        }
+
+        // Modal functions
+        function openTokenModal(tokenId = null) {
+            const modal = document.getElementById('tokenModal');
+            const form = document.getElementById('tokenForm');
+            
+            if (tokenId) {
+                const token = tokens.find(t => t._id === tokenId);
+                document.getElementById('tokenModalTitle').textContent = 'Edit Token';
+                document.getElementById('tokenName').value = token.name;
+                document.getElementById('tokenCategory').value = token.category;
+                document.getElementById('tokenValue').value = token.value;
+                document.getElementById('tokenDescription').value = token.description || '';
+                form.dataset.editId = tokenId;
+            } else {
+                document.getElementById('tokenModalTitle').textContent = 'Add Token';
+                form.reset();
+                delete form.dataset.editId;
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeTokenModal() {
+            document.getElementById('tokenModal').classList.remove('active');
+            hideError('tokenError');
+        }
+
+        function openComponentModal(componentId = null) {
+            const modal = document.getElementById('componentModal');
+            const form = document.getElementById('componentForm');
+            
+            if (componentId) {
+                const component = components.find(c => c._id === componentId);
+                document.getElementById('componentModalTitle').textContent = 'Edit Component';
+                document.getElementById('componentName').value = component.name;
+                document.getElementById('componentCategory').value = component.category;
+                document.getElementById('componentDescription').value = component.description;
+                document.getElementById('componentHtml').value = component.code?.html || '';
+                form.dataset.editId = componentId;
+            } else {
+                document.getElementById('componentModalTitle').textContent = 'Add Component';
+                form.reset();
+                delete form.dataset.editId;
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeComponentModal() {
+            document.getElementById('componentModal').classList.remove('active');
+            hideError('componentError');
+        }
+
+        // CRUD operations
+        async function handleTokenSubmit(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const data = {
+                name: document.getElementById('tokenName').value,
+                category: document.getElementById('tokenCategory').value,
+                value: document.getElementById('tokenValue').value,
+                description: document.getElementById('tokenDescription').value
+            };
+            
+            try {
+                hideError('tokenError');
+                
+                if (form.dataset.editId) {
+                    await axios.put(`/api/tokens/${form.dataset.editId}`, data);
+                } else {
+                    await axios.post('/api/tokens', data);
+                }
+                
+                closeTokenModal();
+                loadData();
+            } catch (error) {
+                showError('tokenError', error.response?.data?.error || 'Failed to save token');
+            }
+        }
+
+        async function handleComponentSubmit(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const data = {
+                name: document.getElementById('componentName').value,
+                category: document.getElementById('componentCategory').value,
+                description: document.getElementById('componentDescription').value,
+                code: {
+                    html: document.getElementById('componentHtml').value
+                }
+            };
+            
+            try {
+                hideError('componentError');
+                
+                if (form.dataset.editId) {
+                    await axios.put(`/api/components/${form.dataset.editId}`, data);
+                } else {
+                    await axios.post('/api/components', data);
+                }
+                
+                closeComponentModal();
+                loadData();
+            } catch (error) {
+                showError('componentError', error.response?.data?.error || 'Failed to save component');
+            }
+        }
+
+        function editToken(tokenId) {
+            openTokenModal(tokenId);
+        }
+
+        async function deleteToken(tokenId) {
+            if (!confirm('Delete this token?')) return;
+            
+            try {
+                await axios.delete(`/api/tokens/${tokenId}`);
+                loadData();
+            } catch (error) {
+                alert('Failed to delete token');
+            }
+        }
+
+        function editComponent(componentId) {
+            openComponentModal(componentId);
+        }
+
+        async function deleteComponent(componentId) {
+            if (!confirm('Delete this component?')) return;
+            
+            try {
+                await axios.delete(`/api/components/${componentId}`);
+                loadData();
+            } catch (error) {
+                alert('Failed to delete component');
+            }
+        }
+
+        // Upload functions
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.add('active');
+            resetUploadModal();
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('active');
+            resetUploadModal();
+        }
+
+        function resetUploadModal() {
+            document.getElementById('jsonFileInput').value = '';
+            document.getElementById('uploadPreview').style.display = 'none';
+            document.getElementById('uploadBtn').disabled = true;
+            selectedTokensData = null;
+            hideError('uploadError');
+            hideError('uploadSuccess');
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.type !== 'application/json') {
+                showError('uploadError', 'Please select a valid JSON file');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const jsonData = JSON.parse(e.target.result);
+                    
+                    if (!jsonData.tokens || !Array.isArray(jsonData.tokens)) {
+                        showError('uploadError', 'Invalid JSON format. Expected { "tokens": [...] }');
+                        return;
+                    }
+
+                    if (jsonData.tokens.length === 0) {
+                        showError('uploadError', 'No tokens found in the JSON file');
+                        return;
+                    }
+
+                    selectedTokensData = jsonData.tokens;
+                    showPreview(jsonData.tokens);
+                    document.getElementById('uploadBtn').disabled = false;
+                    hideError('uploadError');
+
+                } catch (error) {
+                    showError('uploadError', 'Invalid JSON file: ' + error.message);
+                }
+            };
+
+            reader.readAsText(file);
+        }
+
+        function showPreview(tokens) {
+            const preview = document.getElementById('uploadPreview');
+            const content = document.getElementById('previewContent');
+            
+            const previewTokens = tokens.slice(0, 5);
+            const previewHtml = previewTokens.map(token => `
+                <div style="margin-bottom: 10px; padding: 8px; background: white; border-radius: 4px;">
+                    <strong>${token.name || 'unnamed'}</strong> 
+                    <span style="color: #666;">(${token.category || 'no category'})</span><br>
+                    <code style="background: #f0f0f0; padding: 2px 4px; border-radius: 2px;">${token.value || 'no value'}</code>
+                    ${token.description ? `<br><small>${token.description}</small>` : ''}
+                </div>
+            `).join('');
+
+            content.innerHTML = previewHtml;
+            if (tokens.length > 5) {
+                content.innerHTML += `<div style="color: #666; font-style: italic;">... and ${tokens.length - 5} more tokens</div>`;
+            }
+
+            preview.style.display = 'block';
+        }
+
+        async function uploadTokens() {
+            if (!selectedTokensData) {
+                showError('uploadError', 'No tokens selected');
+                return;
+            }
+
+            try {
+                hideError('uploadError');
+                hideError('uploadSuccess');
+                document.getElementById('uploadBtn').disabled = true;
+                document.getElementById('uploadBtn').textContent = 'Uploading...';
+
+                const response = await axios.post('/api/tokens/upload', {
+                    tokens: selectedTokensData
+                });
+
+                const results = response.data.results;
+                
+                let message = `Upload complete!\n`;
+                message += `✅ ${results.success.length} tokens created\n`;
+                message += `⏭️ ${results.skipped.length} tokens skipped (already exist)\n`;
+                message += `❌ ${results.errors.length} errors`;
+
+                if (results.errors.length > 0) {
+                    message += `\n\nErrors:\n`;
+                    results.errors.slice(0, 3).forEach(error => {
+                        message += `• ${error.data.name || 'unnamed'}: ${error.error}\n`;
+                    });
+                    if (results.errors.length > 3) {
+                        message += `• ... and ${results.errors.length - 3} more errors`;
+                    }
+                }
+
+                showSuccess('uploadSuccess', message);
+                
+                // Reload tokens to show new ones
+                await loadTokens();
+                
+                // Close modal after a delay
+                setTimeout(() => {
+                    closeUploadModal();
+                }, 3000);
+
+            } catch (error) {
+                showError('uploadError', error.response?.data?.error || 'Upload failed');
+            } finally {
+                document.getElementById('uploadBtn').disabled = false;
+                document.getElementById('uploadBtn').textContent = 'Upload Tokens';
+            }
+        }
+
+        function showSuccess(elementId, message) {
+            const successEl = document.getElementById(elementId);
+            successEl.textContent = message;
+            successEl.style.display = 'block';
+        }
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
