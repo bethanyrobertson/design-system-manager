@@ -654,11 +654,10 @@
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const username = document.getElementById('username').value;
             const role = document.getElementById('role').value;
             
-            const endpoint = isLoginMode ? '/api/auth/login' : '/api/auth/register';
-            const data = isLoginMode ? { email, password } : { username, email, password, role };
+            const endpoint = isLoginMode ? '/api/login' : '/api/register';
+            const data = isLoginMode ? { email, password } : { email, password, role };
             
             try {
                 hideError('authError');
