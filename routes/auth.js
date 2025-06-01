@@ -54,68 +54,46 @@ router.post('/register', async (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
   try {
-    console.log('Login attempt:', req.body);
     const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    // First, try to find user in database
-    try {
-      const user = await User.findOne({ email });
-      
-      if (user) {
-        const isValidPassword = await bcrypt.compare(password, user.password);
-        if (isValidPassword) {
-          const token = jwt.sign(
-            { id: user._id, username: user.username, role: user.role },
-            JWT_SECRET,
-            { expiresIn: '24h' }
-          );
-
-          console.log('✅ Database user login successful:', email);
-          return res.json({
-            message: 'Login successful',
-            token,
-            user: { id: user._id, username: user.username, email: user.email, role: user.role }
-          });
-        }
-      }
-    } catch (dbError) {
-      console.error('Database error, trying fallback users:', dbError.message);
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Fallback to hardcoded test users if database fails or no user found
-    const testUsers = [
-      { email: 'admin@example.com', password: 'password123', username: 'admin', role: 'admin' },
-      { email: 'designer@example.com', password: 'password', username: 'designer', role: 'designer' },
-      { email: 'dev@example.com', password: 'dev123', username: 'developer', role: 'developer' }
-    ];
+    // DEBUG: Check what we got from database
+    console.log('✅ Test user login successful:', email);
+    console.log('DEBUG - Database user._id:', user._id);
+    console.log('DEBUG - typeof user._id:', typeof user._id);
+    console.log('DEBUG - user object:', user);
 
-    const testUser = testUsers.find(u => u.email === email && u.password === password);
-    
-    if (testUser) {
-      const token = jwt.sign(
-        { id: testUser.email, username: testUser.username, role: testUser.role },
-        JWT_SECRET,
-        { expiresIn: '24h' }
-      );
-
-      console.log('✅ Test user login successful:', email);
-      return res.json({
-        message: 'Login successful (test user)',
-        token,
-        user: { id: testUser.email, username: testUser.username, email: testUser.email, role: testUser.role }
-      });
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // If neither database nor test users match
-    console.log('❌ Invalid credentials for:', email);
-    res.status(401).json({ error: 'Invalid credentials' });
+    // ENSURE we use the ObjectId correctly
+    const token = jwt.sign(
+      { 
+        id: user._id.toString(), // Convert ObjectId to string
+        username: user.username, 
+        role: user.role 
+      },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
 
+    res.json({
+      message: 'Login successful',
+      token,
+      user: { id: user._id, username: user.username, email: user.email, role: user.role }
+    });
   } catch (error) {
-    console.error('💥 Login error:', error);
+    console.error('Login error:', error);
     res.status(500).json({ error: error.message });
   }
 });
