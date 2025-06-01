@@ -2,6 +2,7 @@
 const express = require('express');
 const DesignToken = require('../models/DesignToken');
 const { authenticateToken } = require('../middleware/auth');
+const mongoose = require('mongoose');
 
 const router = express.Router();
 
@@ -83,13 +84,27 @@ router.post('/', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'Name, category, and value are required' });
     }
 
+    // DEBUG: Log the user object to see what's wrong
+    console.log('DEBUG - req.user:', req.user);
+    console.log('DEBUG - req.user.id:', req.user.id);
+    console.log('DEBUG - typeof req.user.id:', typeof req.user.id);
+
+    // Validate that we have a proper ObjectId
+    let userId;
+    if (mongoose.Types.ObjectId.isValid(req.user.id)) {
+      userId = req.user.id;
+    } else {
+      console.error('Invalid user ID format:', req.user.id);
+      return res.status(401).json({ error: 'Invalid user authentication - please log in again' });
+    }
+
     const token = new DesignToken({
       name,
       category,
       value,
       description,
       tags: tags || [],
-      createdBy: req.user.id
+      createdBy: userId
     });
 
     await token.save();
