@@ -1,8 +1,8 @@
 // routes/tokens.js
 const express = require('express');
+const mongoose = require('mongoose');
 const DesignToken = require('../models/DesignToken');
 const { authenticateToken } = require('../middleware/auth');
-const mongoose = require('mongoose');
 
 const router = express.Router();
 
