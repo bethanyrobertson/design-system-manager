@@ -36,7 +36,7 @@
         }
 
         .header {
-            background: white;
+            background: #FBFAF8;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
@@ -49,7 +49,7 @@
             font-size: 24px;
             font-family: "Instrument Serif", serif;
             font-weight: bold;
-            color: #74009F;
+            color: #02514E;
         }
 
         .user-info {
@@ -108,11 +108,11 @@
         }
 
         button {
-            background: #74009F;
+            background: #02514E;
             color: white;
             border: none;
             padding: 12px 20px;
-            border-radius: 4px;
+            border-radius: 50px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 500;
@@ -128,12 +128,13 @@
         }
 
         .btn-secondary {
-            background: #e2e8f0;
-            color: #4a5568;
+            border: 1px solid #02514E;
+            color: #02514E;
+            border-radius: 50px;
         }
 
         .btn-secondary:hover {
-            background: #cbd5e0;
+            background: #CCE6C8;
         }
 
         .btn-danger {
@@ -157,7 +158,7 @@
         }
 
         .section {
-            background: white;
+            background: #FBFAF8;
             border-radius: 8px;
             padding: 20px;
         }
@@ -431,17 +432,15 @@
                     </div>
                 </div>
 
-                <div class="dashboard">
-                    <!-- Tokens Section -->
-                    <div class="section">
-                        <div class="section-header">
-                            <h2>Design Tokens</h2>
-                            <div style="display: flex; gap: 10px;">
-                                <button onclick="openTokenModal()">+ Add Token</button>
-                                <button onclick="openUploadModal()" class="btn-secondary">📤 Upload JSON</button>
-                            </div>
-                        </div>
-                        
+                <div class="section-header">
+                    <h2>Design Tokens</h2>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="exportTokensAsJSON()" class="btn-secondary">📥 Export JSON</button>
+                        <button onclick="openTokenModal()">+ Add Token</button>
+                        <button onclick="openUploadModal()" class="btn-secondary">📤 Upload JSON</button>
+                    </div>
+                </div>
+                 
                         <div class="controls">
                             <input type="text" id="tokenSearch" class="search-input" placeholder="Search tokens..." onkeyup="searchTokens()">
                             <select id="tokenCategoryFilter" class="filter-select" onchange="filterTokens()">
@@ -969,6 +968,55 @@
                 alert('Failed to delete component');
             }
         }
+
+        // Add this simple function to your JavaScript section in index.html
+
+        async function exportTokensAsJSON() {
+            try {
+            // Get all tokens
+            const response = await axios.get('/api/tokens?limit=1000');
+            const allTokens = response.data.tokens;
+            
+            if (allTokens.length === 0) {
+                alert('No tokens to export');
+                return;
+            }
+        
+                // Clean up the data - remove MongoDB specific fields
+                const exportTokens = allTokens.map(token => ({
+                    name: token.name,
+                    category: token.category,
+                    value: token.value,
+                    description: token.description || '',
+                    tags: token.tags || []
+                }));
+                
+                // Create export data
+                const exportData = {
+                    tokens: exportTokens
+                };
+                
+                // Convert to JSON
+                const jsonString = JSON.stringify(exportData, null, 2);
+                
+                // Create download
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `design-tokens-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                // Cleanup
+                URL.revokeObjectURL(url);
+                
+                alert(`Successfully exported ${exportTokens.length} tokens!`);
+                
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('Failed to export tokens');
+            }
+        } 
 
         // Upload functions
         function openUploadModal() {
