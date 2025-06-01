@@ -17,7 +17,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #FEF7FF;
+            background: #F4F3ED;
             color: #333;
             line-height: 1.6;
         }
@@ -190,6 +190,101 @@
 
         .filter-select {
             min-width: 120px;
+        }
+
+        .checkbox-filters {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-weight: 500;
+            color: #4a5568;
+            font-size: 14px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #4a5568;
+            gap: 8px;
+            user-select: none;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            cursor: pointer;
+            accent-color: #74009F;
+        }
+
+        /* Custom checkbox styling (optional - for more control) */
+        .checkbox-item-custom {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #4a5568;
+            gap: 8px;
+            user-select: none;
+            position: relative;
+        }
+
+        .checkbox-item-custom input[type="checkbox"] {
+            opacity: 0;
+            position: absolute;
+            width: 18px;
+            height: 18px;
+        }
+
+        .checkmark {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #d1d5db;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item-custom input[type="checkbox"]:checked + .checkmark {
+            background: #74009F;
+            border-color: #74009F;
+        }
+
+        .checkbox-item-custom input[type="checkbox"]:checked + .checkmark::after {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .checkbox-item:hover .checkmark {
+            border-color: #74009F;
+        }
+
+        /* Responsive design for smaller screens */
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .checkbox-filters {
+                justify-content: center;
+                margin-top: 10px;
+            }
+            
+            .filter-label {
+                display: none;
+            }
         }
 
         /* Items */
@@ -441,45 +536,58 @@
                     </div>
                 </div>
                  
-                        <div class="controls">
-                            <input type="text" id="tokenSearch" class="search-input" placeholder="Search tokens..." onkeyup="searchTokens()">
-                            <select id="tokenCategoryFilter" class="filter-select" onchange="filterTokens()">
-                                <option value="">All</option>
-                                <option value="color">Color</option>
-                                <option value="typography">Typography</option>
-                                <option value="spacing">Spacing</option>
-                            </select>
-                        </div>
+                <div class="controls">
+                    <input type="text" id="tokenSearch" class="search-input" placeholder="Search tokens..." onkeyup="searchTokens()">
+    
+                    <div class="checkbox-filters">
+                        <span class="filter-label">Categories:</span>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="colorFilter" value="color" onchange="filterTokens()" checked>
+                            <span class="checkmark"></span>
+                            Color
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="typographyFilter" value="typography" onchange="filterTokens()" checked>
+                           <span class="checkmark"></span>
+                            Typography
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="spacingFilter" value="spacing" onchange="filterTokens()" checked>
+                            <span class="checkmark"></span>
+                            Spacing
+                        </label>
+                   </div>
+               </div>
 
                         <div id="tokensList" class="items-list">
                             <div class="loading">Loading...</div>
                         </div>
                     </div>
 
-                    <!-- Components Section -->
-                    <div class="section">
-                        <div class="section-header">
-                            <h2>Components</h2>
-                            <button onclick="openComponentModal()">+ Add Component</button>
-                        </div>
+                   // <!-- Components Section -->
+                    //<div class="section">
+                       //<div class="section-header">
+                            //<h2>Components</h2>
+                            //<button onclick="openComponentModal()">+ Add Component</button>
+                        //</div>
                         
-                        <div class="controls">
-                            <input type="text" id="componentSearch" class="search-input" placeholder="Search components..." onkeyup="searchComponents()">
-                            <select id="componentStatusFilter" class="filter-select" onchange="filterComponents()">
-                                <option value="">All Status</option>
-                                <option value="draft">Draft</option>
-                                <option value="review">Review</option>
-                                <option value="approved">Approved</option>
-                            </select>
-                        </div>
+                        //<div class="controls">
+                            //<input type="text" id="componentSearch" class="search-input" placeholder="Search components..." onkeyup="searchComponents()">
+                            //<select id="componentStatusFilter" class="filter-select" onchange="filterComponents()">
+                                //<option value="">All Status</option>
+                                //<option value="draft">Draft</option>
+                                //<option value="review">Review</option>
+                                //<option value="approved">Approved</option>
+                            //</select>
+                        //</div>
 
-                        <div id="componentsList" class="items-list">
-                            <div class="loading">Loading...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        //<div id="componentsList" class="items-list">
+                            //<div class="loading">Loading...</div>
+                        //</div>
+                    //</div>
+                //</div>
+            //</div>
+       //</div>
 
         <!-- Simple Token Modal -->
         <div id="tokenModal" class="modal">
@@ -807,8 +915,88 @@
             renderTokens(filtered);
         }
 
-        function filterTokens() {
-            searchTokens();
+       function filterTokens() {
+    const search = document.getElementById('tokenSearch').value.toLowerCase();
+    
+    // Get checked categories
+    const checkedCategories = [];
+    if (document.getElementById('colorFilter').checked) checkedCategories.push('color');
+    if (document.getElementById('typographyFilter').checked) checkedCategories.push('typography');
+    if (document.getElementById('spacingFilter').checked) checkedCategories.push('spacing');
+    
+    const filtered = tokens.filter(token => {
+        // Check search match
+        const matchesSearch = token.name.toLowerCase().includes(search) || 
+                            (token.description && token.description.toLowerCase().includes(search));
+        
+        // Check category match (only if at least one category is selected)
+        const matchesCategory = checkedCategories.length === 0 || checkedCategories.includes(token.category);
+        
+        return matchesSearch && matchesCategory;
+    });
+    
+    renderTokens(filtered);
+}
+
+// Update searchTokens to use the same logic
+function searchTokens() {
+    filterTokens(); // Just call filterTokens since it handles both search and categories
+}
+
+// Optional: Add "Select All" / "Clear All" functionality
+function selectAllCategories() {
+    document.getElementById('colorFilter').checked = true;
+    document.getElementById('typographyFilter').checked = true;
+    document.getElementById('spacingFilter').checked = true;
+    filterTokens();
+}
+
+function clearAllCategories() {
+    document.getElementById('colorFilter').checked = false;
+    document.getElementById('typographyFilter').checked = false;
+    document.getElementById('spacingFilter').checked = false;
+    filterTokens();
+}function filterTokens() {
+    const search = document.getElementById('tokenSearch').value.toLowerCase();
+    
+    // Get checked categories
+    const checkedCategories = [];
+    if (document.getElementById('colorFilter').checked) checkedCategories.push('color');
+    if (document.getElementById('typographyFilter').checked) checkedCategories.push('typography');
+    if (document.getElementById('spacingFilter').checked) checkedCategories.push('spacing');
+    
+    const filtered = tokens.filter(token => {
+        // Check search match
+        const matchesSearch = token.name.toLowerCase().includes(search) || 
+                            (token.description && token.description.toLowerCase().includes(search));
+        
+        // Check category match (only if at least one category is selected)
+        const matchesCategory = checkedCategories.length === 0 || checkedCategories.includes(token.category);
+        
+        return matchesSearch && matchesCategory;
+    });
+    
+    renderTokens(filtered);
+}
+
+        // Update searchTokens to use the same logic
+        function searchTokens() {
+            filterTokens(); // Just call filterTokens since it handles both search and categories
+        }
+
+        // Optional: Add "Select All" / "Clear All" functionality
+        function selectAllCategories() {
+            document.getElementById('colorFilter').checked = true;
+            document.getElementById('typographyFilter').checked = true;
+            document.getElementById('spacingFilter').checked = true;
+            filterTokens();
+        }
+
+        function clearAllCategories() {
+            document.getElementById('colorFilter').checked = false;
+            document.getElementById('typographyFilter').checked = false;
+            document.getElementById('spacingFilter').checked = false;
+            filterTokens();
         }
 
         function searchComponents() {
