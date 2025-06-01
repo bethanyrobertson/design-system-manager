@@ -60,7 +60,7 @@
 
         .user-badge {
             padding: 4px 12px;
-            background: #667eea;
+            background: #02514E;
             color: white;
             border-radius: 12px;
             font-size: 12px;
@@ -69,7 +69,7 @@
 
         /* Auth Styles */
         .auth-container {
-            background: white;
+            background: #FBFAF8;
             border-radius: 8px;
             padding: 40px;
             max-width: 400px;
@@ -97,14 +97,14 @@
         input, select, textarea {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
+            border: 1px solid #02514E;
             border-radius: 4px;
             font-size: 14px;
         }
 
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #02514E;
         }
 
         button {
@@ -119,7 +119,7 @@
         }
 
         button:hover {
-            background: #5a67d8;
+            background: #CCE6C8;
         }
 
         button:disabled {
@@ -255,8 +255,8 @@
         }
 
         .checkbox-item-custom input[type="checkbox"]:checked + .checkmark {
-            background: #74009F;
-            border-color: #74009F;
+            background: #02514E;
+            border-color: #02514E;
         }
 
         .checkbox-item-custom input[type="checkbox"]:checked + .checkmark::after {
@@ -267,7 +267,7 @@
         }
 
         .checkbox-item:hover .checkmark {
-            border-color: #74009F;
+            border-color: #02514E;
         }
 
         /* Responsive design for smaller screens */
@@ -519,7 +519,7 @@
         <div id="mainApp" style="display: none;">
             <div class="container">
                 <div class="header">
-                    <div class="logo">Design System Manager</div>
+                    <div class="logo">Design Token Manager</div>
                     <div class="user-info">
                         <span id="userName"></span>
                         <span id="userRole" class="user-badge"></span>
@@ -530,9 +530,9 @@
                 <div class="section-header">
                     <h2>Design Tokens</h2>
                     <div style="display: flex; gap: 10px;">
-                        <button onclick="exportTokensAsJSON()" class="btn-secondary">📥 Export JSON</button>
+                        <button onclick="exportTokensAsJSON()" class="btn-secondary">Export JSON</button>
                         <button onclick="openTokenModal()">+ Add Token</button>
-                        <button onclick="openUploadModal()" class="btn-secondary">📤 Upload JSON</button>
+                        <button onclick="openUploadModal()" class="btn-secondary">Upload JSON</button>
                     </div>
                 </div>
                  
@@ -563,31 +563,9 @@
                             <div class="loading">Loading...</div>
                         </div>
                     </div>
-
-                   // <!-- Components Section -->
-                    //<div class="section">
-                       //<div class="section-header">
-                            //<h2>Components</h2>
-                            //<button onclick="openComponentModal()">+ Add Component</button>
-                        //</div>
-                        
-                        //<div class="controls">
-                            //<input type="text" id="componentSearch" class="search-input" placeholder="Search components..." onkeyup="searchComponents()">
-                            //<select id="componentStatusFilter" class="filter-select" onchange="filterComponents()">
-                                //<option value="">All Status</option>
-                                //<option value="draft">Draft</option>
-                                //<option value="review">Review</option>
-                                //<option value="approved">Approved</option>
-                            //</select>
-                        //</div>
-
-                        //<div id="componentsList" class="items-list">
-                            //<div class="loading">Loading...</div>
-                        //</div>
-                    //</div>
-                //</div>
-            //</div>
-       //</div>
+                </div>
+            </div>
+       </div>
 
         <!-- Simple Token Modal -->
         <div id="tokenModal" class="modal">
@@ -679,42 +657,6 @@
                 </div>
             </div>
         </div>
-        <div id="componentModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="componentModalTitle">Add Component</h3>
-                    <button class="close-btn" onclick="closeComponentModal()">&times;</button>
-                </div>
-                <div id="componentError" class="error" style="display: none;"></div>
-                <form id="componentForm">
-                    <div class="form-group">
-                        <label>Name</label>
-                        <input type="text" id="componentName" placeholder="Primary Button" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Category</label>
-                        <select id="componentCategory" required>
-                            <option value="">Select category</option>
-                            <option value="button">Button</option>
-                            <option value="input">Input</option>
-                            <option value="card">Card</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Description</label>
-                        <textarea id="componentDescription" placeholder="Main action button" rows="2" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>HTML Code</label>
-                        <textarea id="componentHtml" placeholder="<button class='btn-primary'>Click me</button>" rows="3"></textarea>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button type="button" class="btn-secondary" onclick="closeComponentModal()">Cancel</button>
-                        <button type="submit">Save</button>
-                    </div>
-                </form>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -801,7 +743,7 @@
             showAuthScreen();
         }
 
-        // UI functions
+        // UI 
         function showAuthScreen() {
             document.getElementById('authScreen').style.display = 'block';
             document.getElementById('mainApp').style.display = 'none';
@@ -842,16 +784,6 @@
             }
         }
 
-        async function loadComponents() {
-            try {
-                const response = await axios.get('/api/components');
-                components = response.data.components;
-                renderComponents(components);
-            } catch (error) {
-                document.getElementById('componentsList').innerHTML = '<div class="error">Failed to load components</div>';
-            }
-        }
-
         // Rendering
         function renderTokens(tokensToRender) {
             const container = document.getElementById('tokensList');
@@ -872,29 +804,6 @@
                     <div class="item-actions">
                         <button onclick="editToken('${token._id}')" class="btn-secondary btn-small">Edit</button>
                         <button onclick="deleteToken('${token._id}')" class="btn-danger btn-small">Delete</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderComponents(componentsToRender) {
-            const container = document.getElementById('componentsList');
-            
-            if (componentsToRender.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">No components found</div>';
-                return;
-            }
-            
-            container.innerHTML = componentsToRender.map(component => `
-                <div class="item">
-                    <div class="item-header">
-                        <span class="item-name">${component.name}</span>
-                        <span class="status-badge status-${component.status}">${component.status}</span>
-                    </div>
-                    <div class="item-description">${component.description}</div>
-                    <div class="item-actions">
-                        <button onclick="editComponent('${component._id}')" class="btn-secondary btn-small">Edit</button>
-                        ${currentUser?.role === 'admin' ? `<button onclick="deleteComponent('${component._id}')" class="btn-danger btn-small">Delete</button>` : ''}
                     </div>
                 </div>
             `).join('');
@@ -938,12 +847,12 @@
     renderTokens(filtered);
 }
 
-// Update searchTokens to use the same logic
+// searchTokens to use the same logic
 function searchTokens() {
     filterTokens(); // Just call filterTokens since it handles both search and categories
 }
 
-// Optional: Add "Select All" / "Clear All" functionality
+// Add "Select All" / "Clear All" functionality
 function selectAllCategories() {
     document.getElementById('colorFilter').checked = true;
     document.getElementById('typographyFilter').checked = true;
@@ -999,24 +908,6 @@ function clearAllCategories() {
             filterTokens();
         }
 
-        function searchComponents() {
-            const search = document.getElementById('componentSearch').value.toLowerCase();
-            const status = document.getElementById('componentStatusFilter').value;
-            
-            const filtered = components.filter(component => {
-                const matchesSearch = component.name.toLowerCase().includes(search) || 
-                                    component.description.toLowerCase().includes(search);
-                const matchesStatus = !status || component.status === status;
-                return matchesSearch && matchesStatus;
-            });
-            
-            renderComponents(filtered);
-        }
-
-        function filterComponents() {
-            searchComponents();
-        }
-
         // Modal functions
         function openTokenModal(tokenId = null) {
             const modal = document.getElementById('tokenModal');
@@ -1044,33 +935,8 @@ function clearAllCategories() {
             hideError('tokenError');
         }
 
-        function openComponentModal(componentId = null) {
-            const modal = document.getElementById('componentModal');
-            const form = document.getElementById('componentForm');
-            
-            if (componentId) {
-                const component = components.find(c => c._id === componentId);
-                document.getElementById('componentModalTitle').textContent = 'Edit Component';
-                document.getElementById('componentName').value = component.name;
-                document.getElementById('componentCategory').value = component.category;
-                document.getElementById('componentDescription').value = component.description;
-                document.getElementById('componentHtml').value = component.code?.html || '';
-                form.dataset.editId = componentId;
-            } else {
-                document.getElementById('componentModalTitle').textContent = 'Add Component';
-                form.reset();
-                delete form.dataset.editId;
-            }
-            
-            modal.classList.add('active');
-        }
 
-        function closeComponentModal() {
-            document.getElementById('componentModal').classList.remove('active');
-            hideError('componentError');
-        }
-
-        // CRUD operations
+        // CRUD 
         async function handleTokenSubmit(e) {
             e.preventDefault();
             
@@ -1098,34 +964,6 @@ function clearAllCategories() {
             }
         }
 
-        async function handleComponentSubmit(e) {
-            e.preventDefault();
-            
-            const form = e.target;
-            const data = {
-                name: document.getElementById('componentName').value,
-                category: document.getElementById('componentCategory').value,
-                description: document.getElementById('componentDescription').value,
-                code: {
-                    html: document.getElementById('componentHtml').value
-                }
-            };
-            
-            try {
-                hideError('componentError');
-                
-                if (form.dataset.editId) {
-                    await axios.put(`/api/components/${form.dataset.editId}`, data);
-                } else {
-                    await axios.post('/api/components', data);
-                }
-                
-                closeComponentModal();
-                loadData();
-            } catch (error) {
-                showError('componentError', error.response?.data?.error || 'Failed to save component');
-            }
-        }
 
         function editToken(tokenId) {
             openTokenModal(tokenId);
@@ -1142,26 +980,10 @@ function clearAllCategories() {
             }
         }
 
-        function editComponent(componentId) {
-            openComponentModal(componentId);
-        }
-
-        async function deleteComponent(componentId) {
-            if (!confirm('Delete this component?')) return;
-            
-            try {
-                await axios.delete(`/api/components/${componentId}`);
-                loadData();
-            } catch (error) {
-                alert('Failed to delete component');
-            }
-        }
-
-        // Add this simple function to your JavaScript section in index.html
-
+        // export button
         async function exportTokensAsJSON() {
             try {
-            // Get all tokens
+            // Get all 
             const response = await axios.get('/api/tokens?limit=1000');
             const allTokens = response.data.tokens;
             
@@ -1170,7 +992,6 @@ function clearAllCategories() {
                 return;
             }
         
-                // Clean up the data - remove MongoDB specific fields
                 const exportTokens = allTokens.map(token => ({
                     name: token.name,
                     category: token.category,
@@ -1187,7 +1008,7 @@ function clearAllCategories() {
                 // Convert to JSON
                 const jsonString = JSON.stringify(exportData, null, 2);
                 
-                // Create download
+                // download
                 const blob = new Blob([jsonString], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
@@ -1206,7 +1027,7 @@ function clearAllCategories() {
             }
         } 
 
-        // Upload functions
+        // Upload
         function openUploadModal() {
             document.getElementById('uploadModal').classList.add('active');
             resetUploadModal();

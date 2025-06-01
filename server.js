@@ -6,7 +6,6 @@ const path = require('path');
 // Import routes
 const authRoutes = require('./routes/auth');
 const tokenRoutes = require('./routes/tokens');
-const componentRoutes = require('./routes/components');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -86,7 +85,6 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/tokens', tokenRoutes);
-app.use('/api/components', componentRoutes);
 
 // Serve frontend
 app.get('/', (req, res) => {
