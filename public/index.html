@@ -647,7 +647,7 @@
     <script>
         // Simple global state
         let currentUser = null;
-        let authToken = null; // Removed localStorage access since it's not supported in artifacts
+        let authToken = localStorage.getItem('authToken');
         let isLoginMode = true;
         let tokens = [];
         let components = [];
@@ -664,7 +664,12 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             setupEventListeners();
-            showAuthScreen();
+            if (authToken) {
+                showMainApp();
+                loadData();
+            } else {
+                showAuthScreen();
+            }
         });
 
         function setupEventListeners() {
@@ -717,6 +722,7 @@
                 }
                 
                 authToken = 'mock-token-' + Date.now();
+                localStorage.setItem('authToken', authToken);
                 showMainApp();
                 loadData();
             } catch (error) {
@@ -725,6 +731,7 @@
         }
 
         function logout() {
+            localStorage.removeItem('authToken');
             authToken = null;
             currentUser = null;
             showAuthScreen();
