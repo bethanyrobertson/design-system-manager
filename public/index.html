@@ -653,13 +653,10 @@
         let components = [];
         let selectedTokensData = null;
 
-        // Mock authentication for demo purposes
-        const mockUsers = [
-            { email: 'demo@example.com', password: 'demo123', username: 'Demo User', role: 'designer' }
-        ];
-
-        // Start with empty tokens array
-        const mockTokens = [];
+        // Setup axios with auth token
+        if (authToken) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
+        }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -699,39 +696,32 @@
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value;
             const role = document.getElementById('role').value;
+            
+            const endpoint = isLoginMode ? '/api/auth/login' : '/api/auth/register';
+            const data = isLoginMode ? { email, password } : { email, password, username, role };
             
             try {
                 hideError('authError');
+                const response = await axios.post(endpoint, data);
                 
-                if (isLoginMode) {
-                    // Mock login
-                    const user = mockUsers.find(u => u.email === email && u.password === password);
-                    if (!user) {
-                        throw new Error('Invalid credentials');
-                    }
-                    currentUser = user;
-                } else {
-                    // Mock register
-                    currentUser = {
-                        email: email,
-                        username: email.split('@')[0],
-                        role: role
-                    };
-                    mockUsers.push({ ...currentUser, password: password });
-                }
+                authToken = response.data.token;
+                currentUser = response.data.user;
                 
-                authToken = 'mock-token-' + Date.now();
                 localStorage.setItem('authToken', authToken);
+                axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
+                
                 showMainApp();
                 loadData();
             } catch (error) {
-                showError('authError', error.message || 'Authentication failed');
+                showError('authError', error.response?.data?.error || 'Authentication failed');
             }
         }
 
         function logout() {
             localStorage.removeItem('authToken');
+            delete axios.defaults.headers.common['Authorization'];
             authToken = null;
             currentUser = null;
             showAuthScreen();
@@ -765,19 +755,21 @@
 
         // Data loading
         async function loadData() {
-            await Promise.all([loadTokens()]);
+            await Promise.all([loadTokens(), loadComponents()]);
         }
 
         async function loadTokens() {
             try {
-                // Mock API call
-                setTimeout(() => {
-                    tokens = [...mockTokens];
-                    renderTokens(tokens);
-                }, 500);
+                const response = await axios.get('/api/tokens');
+                tokens = response.data.tokens;
+                renderTokens(tokens);
             } catch (error) {
                 document.getElementById('tokensList').innerHTML = '<div class="error">Failed to load tokens</div>';
             }
+        }
+
+        async function loadComponents() {
+            // Implementation for components if needed
         }
 
         // Rendering
@@ -873,19 +865,15 @@
                 hideError('tokenError');
                 
                 if (form.dataset.editId) {
-                    // Mock edit
-                    const index = tokens.findIndex(t => t._id === form.dataset.editId);
-                    tokens[index] = { ...tokens[index], ...data };
+                    await axios.put(`/api/tokens/${form.dataset.editId}`, data);
                 } else {
-                    // Mock create
-                    const newToken = { ...data, _id: Date.now().toString() };
-                    tokens.push(newToken);
+                    await axios.post('/api/tokens', data);
                 }
                 
                 closeTokenModal();
-                renderTokens(tokens);
+                loadData();
             } catch (error) {
-                showError('tokenError', error.message || 'Failed to save token');
+                showError('tokenError', error.response?.data?.error || 'Failed to save token');
             }
         }
 
@@ -897,9 +885,8 @@
             if (!confirm('Delete this token?')) return;
             
             try {
-                // Mock delete
-                tokens = tokens.filter(t => t._id !== tokenId);
-                renderTokens(tokens);
+                await axios.delete(`/api/tokens/${tokenId}`);
+                loadData();
             } catch (error) {
                 alert('Failed to delete token');
             }
@@ -908,12 +895,16 @@
         // export button
         async function exportTokensAsJSON() {
             try {
-                if (tokens.length === 0) {
+                // Get all tokens from API
+                const response = await axios.get('/api/tokens?limit=1000');
+                const allTokens = response.data.tokens;
+                
+                if (allTokens.length === 0) {
                     alert('No tokens to export');
                     return;
                 }
             
-                const exportTokens = tokens.map(token => ({
+                const exportTokens = allTokens.map(token => ({
                     name: token.name,
                     category: token.category,
                     value: token.value,
@@ -1039,45 +1030,31 @@
                 document.getElementById('uploadBtn').disabled = true;
                 document.getElementById('uploadBtn').textContent = 'Uploading...';
 
-                // Mock upload process
-                await new Promise(resolve => setTimeout(resolve, 1000));
-
-                let successCount = 0;
-                let skippedCount = 0;
-                let errorCount = 0;
-
-                selectedTokensData.forEach(tokenData => {
-                    try {
-                        // Check if token already exists
-                        const exists = tokens.some(t => t.name === tokenData.name);
-                        if (exists) {
-                            skippedCount++;
-                        } else {
-                            // Add new token
-                            const newToken = {
-                                _id: Date.now().toString() + Math.random(),
-                                name: tokenData.name,
-                                category: tokenData.category,
-                                value: tokenData.value,
-                                description: tokenData.description || ''
-                            };
-                            tokens.push(newToken);
-                            successCount++;
-                        }
-                    } catch (error) {
-                        errorCount++;
-                    }
+                const response = await axios.post('/api/tokens/upload', {
+                    tokens: selectedTokensData
                 });
 
+                const results = response.data.results;
+                
                 let message = `Upload complete!\n`;
-                message += `${successCount} tokens created\n`;
-                message += `${skippedCount} tokens skipped (already exist)\n`;
-                message += `${errorCount} errors`;
+                message += `${results.success.length} tokens created\n`;
+                message += `${results.skipped.length} tokens skipped (already exist)\n`;
+                message += `${results.errors.length} errors`;
+
+                if (results.errors.length > 0) {
+                    message += `\n\nErrors:\n`;
+                    results.errors.slice(0, 3).forEach(error => {
+                        message += `• ${error.data.name || 'unnamed'}: ${error.error}\n`;
+                    });
+                    if (results.errors.length > 3) {
+                        message += `• ... and ${results.errors.length - 3} more errors`;
+                    }
+                }
 
                 showSuccess('uploadSuccess', message);
                 
                 // Reload tokens to show new ones
-                renderTokens(tokens);
+                await loadTokens();
                 
                 // Close modal after a delay
                 setTimeout(() => {
@@ -1085,7 +1062,7 @@
                 }, 3000);
 
             } catch (error) {
-                showError('uploadError', error.message || 'Upload failed');
+                showError('uploadError', error.response?.data?.error || 'Upload failed');
             } finally {
                 document.getElementById('uploadBtn').disabled = false;
                 document.getElementById('uploadBtn').textContent = 'Upload Tokens';
