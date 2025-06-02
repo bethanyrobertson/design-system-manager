@@ -128,6 +128,8 @@
 
         button:hover {
             background: #CCE6C8;
+            color: #02514E;
+            border: 1px solid #02514E;
         }
 
         button:disabled {
@@ -285,72 +287,126 @@
             }
         }
 
-        /* Items */
-        .items-list {
-            max-height: 400px;
+        /* ===== NEW TABLE STYLES ===== */
+        .tokens-table-container {
+            max-height: 600px;
             overflow-y: auto;
+            border-radius: 8px;
+            background: white;
+            border: 1px solid #ACB4A2;
         }
 
-        .item {
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            padding: 15px;
-            margin-bottom: 10px;
-            background: #f9f9f9;
-        }
-
-        .item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .item-name {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .item-category {
-            background: #DFF4ED;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            color: #4a5568;
-        }
-
-        .item-description {
-            color: #666;
+        .tokens-table {
+            width: 100%;
+            border-collapse: collapse;
             font-size: 14px;
-            margin-bottom: 8px;
         }
 
-        .item-value {
-            background: #f1f5f9;
-            padding: 8px;
+        .tokens-table th {
+            background: #f7fafc;
+            color: #4a5568;
+            font-weight: 600;
+            text-align: left;
+            padding: 16px;
+            border-bottom: 2px solid #ACB4A2;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .tokens-table td {
+            padding: 16px;
+            border-bottom: 1px solid #ACB4A2;
+            vertical-align: middle;
+        }
+
+        .tokens-table tbody tr:hover {
+            background: #f7fafc;
+        }
+
+        .token-example {
+            width: 40px;
+            height: 24px;
             border-radius: 4px;
-            font-family: monospace;
-            font-size: 13px;
-            margin-bottom: 8px;
+            border: 1px solid #ACB4A2;
+            display: inline-block;
+            margin-right: 8px;
         }
 
-        .item-actions {
+        .token-name {
+            font-family: monospace;
+            font-weight: 500;
+            color: #2d3748;
             display: flex;
+            align-items: center;
             gap: 8px;
         }
 
-        .status-badge {
-            padding: 2px 8px;
+        .copy-btn {
+            background: none;
+            border: 1px solid #ACB4A2;
+            color: #718096;
+            padding: 4px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .token-name:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            background: #f7fafc;
+            color: #4a5568;
+        }
+
+        .token-value {
+            font-family: monospace;
+            color: #4a5568;
+            font-size: 13px;
+        }
+
+        .token-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .tokens-table tbody tr:hover .token-actions {
+            opacity: 1;
+        }
+
+        .category-badge {
+            background: #e6fffa;
+            color: #319795;
+            padding: 4px 8px;
             border-radius: 12px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
             text-transform: uppercase;
         }
 
-        .status-draft { background: #fed7d7; color: #c53030; }
-        .status-review { background: #bee3f8; color: #3182ce; }
-        .status-approved { background: #c6f6d5; color: #38a169; }
-        .status-deprecated { background: #fbb6ce; color: #d53f8c; }
+        .category-badge.color { background: #fed7d7; color: #c53030; }
+        .category-badge.typography { background: #bee3f8; color: #3182ce; }
+        .category-badge.spacing { background: #c6f6d5; color: #38a169; }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 8px;
+            color: #4a5568;
+        }
+
+        /* ===== END NEW TABLE STYLES ===== */
 
         /* Modal */
         .modal {
@@ -455,6 +511,16 @@
                 flex-direction: column;
                 gap: 15px;
             }
+
+            .tokens-table th,
+            .tokens-table td {
+                padding: 12px 8px;
+            }
+
+            .token-example {
+                width: 30px;
+                height: 20px;
+            }
         }
     </style>
 </head>
@@ -463,7 +529,7 @@
         <!-- Auth Screen -->
         <div id="authScreen">
             <div class="auth-container">
-                <h2 id="authTitle">Login</h2>
+                <h2 id="authTitle">Design Token Manager</h2>
                 <div id="authError" class="error" style="display: none;"></div>
                 <form id="authForm">
                     <div class="form-group" id="usernameGroup" style="display: none;">
@@ -545,14 +611,16 @@
                        </div>
                    </div>
 
-                    <div id="tokensList" class="items-list">
+                    <!-- =====TABLE STRUCTURE ===== -->
+                    <div id="tokensList" class="tokens-table-container">
                         <div class="loading">Loading...</div>
                     </div>
+                    <!-- ===== END UPDATED TABLE STRUCTURE ===== -->
                 </div>
             </div>
         </div>
 
-        <!-- Simple Token Modal -->
+        <!-- Token Modal -->
         <div id="tokenModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -772,36 +840,104 @@
             // Implementation for components if needed
         }
 
-        // Rendering
+        // ===== UPDATED RENDERING FUNCTION =====
         function renderTokens(tokensToRender) {
             const container = document.getElementById('tokensList');
             
             if (tokensToRender.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">No tokens found</div>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No tokens found</h3>
+                        <p>Add your first design token to get started</p>
+                    </div>
+                `;
                 return;
             }
             
-            container.innerHTML = tokensToRender.map(token => `
-                <div class="item">
-                    <div class="item-header">
-                        <span class="item-name">${token.name}</span>
-                        <span class="item-category">${token.category}</span>
-                    </div>
-                    <div class="item-value">${token.value}</div>
-                    ${token.description ? `<div class="item-description">${token.description}</div>` : ''}
-                    <div class="item-actions">
-                        <button onclick="editToken('${token._id}')" class="btn-secondary btn-small">Edit</button>
-                        <button onclick="deleteToken('${token._id}')" class="btn-danger btn-small">Delete</button>
-                    </div>
-                </div>
-            `).join('');
+            container.innerHTML = `
+                <table class="tokens-table">
+                    <thead>
+                        <tr>
+                            <th>Example</th>
+                            <th>Token</th>
+                            <th>Value</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tokensToRender.map(token => `
+                            <tr>
+                                <td>
+                                    ${generateTokenExample(token)}
+                                </td>
+                                <td>
+                                    <div class="token-name">
+                                        ${token.name}
+                                        <button class="copy-btn" onclick="copyToClipboard('${token.name}')" title="Copy token name">
+                                            📋
+                                        </button>
+                                    </div>
+                                    <div style="margin-top: 4px;">
+                                        <span class="category-badge ${token.category}">${token.category}</span>
+                                    </div>
+                                    ${token.description ? `<div style="color: #718096; font-size: 12px; margin-top: 4px;">${token.description}</div>` : ''}
+                                </td>
+                                <td>
+                                    <span class="token-value">${token.value}</span>
+                                </td>
+                                <td>
+                                    <div class="token-actions">
+                                        <button onclick="editToken('${token._id}')" class="btn-secondary btn-small">Edit</button>
+                                        <button onclick="deleteToken('${token._id}')" class="btn-danger btn-small">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
         }
 
-        // Search and filter - Updated for radio buttons
+        // ===== NEW HELPER FUNCTION =====
+        function generateTokenExample(token) {
+            switch (token.category) {
+                case 'color':
+                    return `<div class="token-example" style="background-color: ${token.value};"></div>`;
+                case 'typography':
+                    // For typography, show a text sample
+                    return `<div style="font-size: ${token.value}; line-height: 1; color: #333;">Aa</div>`;
+                case 'spacing':
+                    // For spacing, show a visual representation
+                    const size = parseInt(token.value) || 16;
+                    return `<div class="token-example" style="width: ${Math.min(size, 40)}px; height: 8px; background: #718096;"></div>`;
+                default:
+                    return `<div class="token-example" style="background: #f7fafc; border: 2px dashed #cbd5e0;"></div>`;
+            }
+        }
+
+        // ===== NEW COPY FUNCTION =====
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Show a brief success indicator
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = '✓';
+                button.style.background = '#c6f6d5';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 1000);
+            }).catch(() => {
+                alert('Failed to copy to clipboard');
+            });
+        }
+        // ===== END NEW FUNCTIONS =====
+
+        // Search and filter 
         function filterTokens() {
             const search = document.getElementById('tokenSearch').value.toLowerCase();
             
-            // Get selected category from radio buttons
+            // Get selected category
             const selectedCategory = document.querySelector('input[name="categoryFilter"]:checked').value;
             
             const filtered = tokens.filter(token => {
