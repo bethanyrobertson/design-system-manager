@@ -128,8 +128,6 @@
 
         button:hover {
             background: #CCE6C8;
-            color: #02514E;
-            border: 1px solid #02514E;
         }
 
         button:disabled {
@@ -156,6 +154,7 @@
 
         .btn-danger:hover {
             background: #fed7d7;
+            border: 1px solid #e53e3e;
         }
 
         .btn-small {
@@ -529,7 +528,7 @@
         <!-- Auth Screen -->
         <div id="authScreen">
             <div class="auth-container">
-                <h2 id="authTitle">Design Token Manager</h2>
+                <h2 id="authTitle">Login</h2>
                 <div id="authError" class="error" style="display: none;"></div>
                 <form id="authForm">
                     <div class="form-group" id="usernameGroup" style="display: none;">
@@ -611,7 +610,7 @@
                        </div>
                    </div>
 
-                    <!-- =====TABLE STRUCTURE ===== -->
+                    <!-- ===== UPDATED TABLE STRUCTURE ===== -->
                     <div id="tokensList" class="tokens-table-container">
                         <div class="loading">Loading...</div>
                     </div>
@@ -620,7 +619,7 @@
             </div>
         </div>
 
-        <!-- Token Modal -->
+        <!-- Simple Token Modal -->
         <div id="tokenModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -873,7 +872,7 @@
                                 <td>
                                     <div class="token-name">
                                         ${token.name}
-                                        <button class="copy-btn" onclick="copyToClipboard('${token.name}')" title="Copy token name">
+                                        <button class="copy-btn" onclick="copyToClipboard('${token.name}: ${token.value}', this)" title="Copy token name and value">
                                             📋
                                         </button>
                                     </div>
@@ -916,20 +915,68 @@
         }
 
         // ===== NEW COPY FUNCTION =====
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                // Show a brief success indicator
-                const button = event.target;
+        function copyToClipboard(text, buttonElement) {
+            // Prevent the click from bubbling up
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            
+            // Use the passed button element or try to get it from the event
+            const button = buttonElement || event.target;
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    // Show a brief success indicator
+                    const originalText = button.textContent;
+                    const originalBackground = button.style.background;
+                    button.textContent = '✓';
+                    button.style.background = '#c6f6d5';
+                    button.style.color = '#38a169';
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.style.background = originalBackground;
+                        button.style.color = '#718096';
+                    }, 1500);
+                }).catch((err) => {
+                    console.error('Clipboard API failed:', err);
+                    fallbackCopyToClipboard(text, button);
+                });
+            } else {
+                // Fallback for browsers that don't support clipboard API
+                fallbackCopyToClipboard(text, button);
+            }
+        }
+
+        // Fallback copy method for older browsers
+        function fallbackCopyToClipboard(text, button) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                // Show success indicator
                 const originalText = button.textContent;
                 button.textContent = '✓';
                 button.style.background = '#c6f6d5';
+                button.style.color = '#38a169';
                 setTimeout(() => {
                     button.textContent = originalText;
                     button.style.background = '';
-                }, 1000);
-            }).catch(() => {
-                alert('Failed to copy to clipboard');
-            });
+                    button.style.color = '#718096';
+                }, 1500);
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+                alert('Copy failed. Please select and copy manually: ' + text);
+            } finally {
+                document.body.removeChild(textArea);
+            }
         }
         // ===== END NEW FUNCTIONS =====
 
