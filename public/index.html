@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -16,18 +16,26 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: "Noto Sans", sans-serif;
             background: #F4F3ED;
             color: #333;
             line-height: 1.6;
         }
 
-        .instrument-serif-regular {
-            font-family: "Instrument Serif", serif;
-            font-weight: 400;
+        .source-serif-4 {
+            font-family: "Source Serif 4", serif;
+            font-optical-sizing: auto;
+            font-weight: 500;
             font-style: normal;
         }
 
+        .noto-sans {
+            font-family: "Noto Sans", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-variation-settings: "wdth" 100;
+        }
 
         .container {
             max-width: 1200px;
@@ -46,8 +54,8 @@
         }
 
         .logo {
-            font-size: 24px;
-            font-family: "Instrument Serif", serif;
+            font-size: 40px;
+            font-family: "Source Serif 4", serif;
             font-weight: bold;
             color: #02514E;
         }
@@ -77,7 +85,7 @@
         }
 
         .auth-container h2 {
-            font-family: "Instrument Serif", serif;
+            font-family: "Source Serif 4", serif;
             text-align: center;
             margin-bottom: 30px;
             color: #333;
@@ -128,6 +136,7 @@
         }
 
         .btn-secondary {
+            background: white;
             border: 1px solid #02514E;
             color: #02514E;
             border-radius: 50px;
@@ -138,11 +147,13 @@
         }
 
         .btn-danger {
-            background: #e53e3e;
+            background: white;
+            color: #e53e3e;
+            border: 1px solid #e53e3e;
         }
 
         .btn-danger:hover {
-            background: #c53030;
+            background: #fed7d7;
         }
 
         .btn-small {
@@ -151,12 +162,6 @@
         }
 
         /* Layout */
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
         .section {
             background: #FBFAF8;
             border-radius: 8px;
@@ -167,7 +172,7 @@
             margin-bottom: 20px;
             color: #333;
             font-size: 18px;
-            font-family: "Instrument Serif", serif;
+            font-family: "Source Serif 4", serif;
         }
 
         .section-header {
@@ -180,16 +185,14 @@
         /* Controls */
         .controls {
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 15px;
             margin-bottom: 20px;
         }
 
         .search-input {
-            flex: 1;
-        }
-
-        .filter-select {
-            min-width: 120px;
+            width: 100%;
+            min-width: 200px;
         }
 
         .checkbox-filters {
@@ -213,29 +216,11 @@
             color: #4a5568;
             gap: 8px;
             user-select: none;
-        }
-
-        .checkbox-item input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            margin: 0;
-            cursor: pointer;
-            accent-color: #74009F;
-        }
-
-        /* Custom checkbox styling (optional - for more control) */
-        .checkbox-item-custom {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            font-size: 14px;
-            color: #4a5568;
-            gap: 8px;
-            user-select: none;
             position: relative;
         }
 
-        .checkbox-item-custom input[type="checkbox"] {
+        .checkbox-item input[type="radio"], 
+        .checkbox-item input[type="checkbox"] {
             opacity: 0;
             position: absolute;
             width: 18px;
@@ -254,12 +239,25 @@
             transition: all 0.2s ease;
         }
 
-        .checkbox-item-custom input[type="checkbox"]:checked + .checkmark {
+        .checkbox-item input[type="radio"] + .checkmark {
+            border-radius: 50%;
+        }
+
+        .checkbox-item input[type="radio"]:checked + .checkmark,
+        .checkbox-item input[type="checkbox"]:checked + .checkmark {
             background: #02514E;
             border-color: #02514E;
         }
 
-        .checkbox-item-custom input[type="checkbox"]:checked + .checkmark::after {
+        .checkbox-item input[type="radio"]:checked + .checkmark::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .checkbox-item input[type="checkbox"]:checked + .checkmark::after {
             content: '✓';
             color: white;
             font-size: 12px;
@@ -314,7 +312,7 @@
         }
 
         .item-category {
-            background: #e2e8f0;
+            background: #DFF4ED;
             padding: 2px 8px;
             border-radius: 12px;
             font-size: 12px;
@@ -395,6 +393,9 @@
             font-size: 20px;
             cursor: pointer;
             color: #666;
+            padding: 0;
+            width: auto;
+            border-radius: 0;
         }
 
         /* Messages */
@@ -426,7 +427,7 @@
         }
 
         .auth-toggle a {
-            color: #667eea;
+            color: #02514E;
             text-decoration: none;
             font-weight: 500;
         }
@@ -435,40 +436,19 @@
             text-decoration: underline;
         }
 
-        /* Stats */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .stat {
-            background: #667eea;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            opacity: 0.9;
-        }
-
         /* Responsive */
         @media (max-width: 768px) {
-            .dashboard {
-                grid-template-columns: 1fr;
+            .section-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
             }
             
-            .controls {
-                flex-direction: column;
+            .section-header > div {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
             }
             
             .header {
@@ -527,45 +507,50 @@
                     </div>
                 </div>
 
-                <div class="section-header">
-                    <h2>Design Tokens</h2>
-                    <div style="display: flex; gap: 10px;">
-                        <button onclick="exportTokensAsJSON()" class="btn-secondary">Export JSON</button>
-                        <button onclick="openTokenModal()">+ Add Token</button>
-                        <button onclick="openUploadModal()" class="btn-secondary">Upload JSON</button>
-                    </div>
-                </div>
-                 
-                <div class="controls">
-                    <input type="text" id="tokenSearch" class="search-input" placeholder="Search tokens..." onkeyup="searchTokens()">
-    
-                    <div class="checkbox-filters">
-                        <span class="filter-label">Categories:</span>
-                        <label class="checkbox-item">
-                            <input type="checkbox" id="colorFilter" value="color" onchange="filterTokens()" checked>
-                            <span class="checkmark"></span>
-                            Color
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" id="typographyFilter" value="typography" onchange="filterTokens()" checked>
-                           <span class="checkmark"></span>
-                            Typography
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" id="spacingFilter" value="spacing" onchange="filterTokens()" checked>
-                            <span class="checkmark"></span>
-                            Spacing
-                        </label>
-                   </div>
-               </div>
-
-                        <div id="tokensList" class="items-list">
-                            <div class="loading">Loading...</div>
+                <div class="section">
+                    <div class="section-header">
+                        <h2>Design Tokens</h2>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button onclick="exportTokensAsJSON()">Export JSON</button>
+                            <button onclick="openTokenModal()">+ Add Token</button>
+                            <button onclick="openUploadModal()">Upload JSON</button>
                         </div>
+                    </div>
+                     
+                    <div class="controls">
+                        <input type="text" id="tokenSearch" class="search-input" placeholder="Search tokens..." onkeyup="searchTokens()">
+        
+                        <div class="checkbox-filters">
+                            <span class="filter-label">Categories:</span>
+                            <label class="checkbox-item">
+                                <input type="radio" id="allFilter" name="categoryFilter" value="all" onchange="filterTokens()" checked>
+                                <span class="checkmark"></span>
+                                All
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="radio" id="colorFilter" name="categoryFilter" value="color" onchange="filterTokens()">
+                                <span class="checkmark"></span>
+                                Color
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="radio" id="typographyFilter" name="categoryFilter" value="typography" onchange="filterTokens()">
+                               <span class="checkmark"></span>
+                                Typography
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="radio" id="spacingFilter" name="categoryFilter" value="spacing" onchange="filterTokens()">
+                                <span class="checkmark"></span>
+                                Spacing
+                            </label>
+                       </div>
+                   </div>
+
+                    <div id="tokensList" class="items-list">
+                        <div class="loading">Loading...</div>
                     </div>
                 </div>
             </div>
-       </div>
+        </div>
 
         <!-- Simple Token Modal -->
         <div id="tokenModal" class="modal">
@@ -662,34 +647,30 @@
     <script>
         // Simple global state
         let currentUser = null;
-        let authToken = localStorage.getItem('authToken');
+        let authToken = null; // Removed localStorage access since it's not supported in artifacts
         let isLoginMode = true;
         let tokens = [];
         let components = [];
-
         let selectedTokensData = null;
 
-        // Setup
-        if (authToken) {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
-        }
+        // Mock authentication for demo purposes
+        const mockUsers = [
+            { email: 'demo@example.com', password: 'demo123', username: 'Demo User', role: 'designer' }
+        ];
+
+        // Start with empty tokens array
+        const mockTokens = [];
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             setupEventListeners();
-            if (authToken) {
-                showMainApp();
-                loadData();
-            } else {
-                showAuthScreen();
-            }
+            showAuthScreen();
         });
 
         function setupEventListeners() {
             document.getElementById('authForm').addEventListener('submit', handleAuth);
             document.getElementById('authToggle').addEventListener('click', toggleAuthMode);
             document.getElementById('tokenForm').addEventListener('submit', handleTokenSubmit);
-            document.getElementById('componentForm').addEventListener('submit', handleComponentSubmit);
             
             // File upload listener
             document.getElementById('jsonFileInput').addEventListener('change', handleFileSelect);
@@ -715,29 +696,35 @@
             const password = document.getElementById('password').value;
             const role = document.getElementById('role').value;
             
-            const endpoint = isLoginMode ? '/api/auth/login' : '/api/auth/register';
-            const data = isLoginMode ? { email, password } : { email, password, role };
-            
             try {
                 hideError('authError');
-                const response = await axios.post(endpoint, data);
                 
-                authToken = response.data.token;
-                currentUser = response.data.user;
+                if (isLoginMode) {
+                    // Mock login
+                    const user = mockUsers.find(u => u.email === email && u.password === password);
+                    if (!user) {
+                        throw new Error('Invalid credentials');
+                    }
+                    currentUser = user;
+                } else {
+                    // Mock register
+                    currentUser = {
+                        email: email,
+                        username: email.split('@')[0],
+                        role: role
+                    };
+                    mockUsers.push({ ...currentUser, password: password });
+                }
                 
-                localStorage.setItem('authToken', authToken);
-                axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
-                
+                authToken = 'mock-token-' + Date.now();
                 showMainApp();
                 loadData();
             } catch (error) {
-                showError('authError', error.response?.data?.error || 'Authentication failed');
+                showError('authError', error.message || 'Authentication failed');
             }
         }
 
         function logout() {
-            localStorage.removeItem('authToken');
-            delete axios.defaults.headers.common['Authorization'];
             authToken = null;
             currentUser = null;
             showAuthScreen();
@@ -771,14 +758,16 @@
 
         // Data loading
         async function loadData() {
-            await Promise.all([loadTokens(), loadComponents()]);
+            await Promise.all([loadTokens()]);
         }
 
         async function loadTokens() {
             try {
-                const response = await axios.get('/api/tokens');
-                tokens = response.data.tokens;
-                renderTokens(tokens);
+                // Mock API call
+                setTimeout(() => {
+                    tokens = [...mockTokens];
+                    renderTokens(tokens);
+                }, 500);
             } catch (error) {
                 document.getElementById('tokensList').innerHTML = '<div class="error">Failed to load tokens</div>';
             }
@@ -809,103 +798,29 @@
             `).join('');
         }
 
-        // Search and filter
-        function searchTokens() {
+        // Search and filter - Updated for radio buttons
+        function filterTokens() {
             const search = document.getElementById('tokenSearch').value.toLowerCase();
-            const category = document.getElementById('tokenCategoryFilter').value;
+            
+            // Get selected category from radio buttons
+            const selectedCategory = document.querySelector('input[name="categoryFilter"]:checked').value;
             
             const filtered = tokens.filter(token => {
+                // Check search match
                 const matchesSearch = token.name.toLowerCase().includes(search) || 
                                     (token.description && token.description.toLowerCase().includes(search));
-                const matchesCategory = !category || token.category === category;
+                
+                // Check category match (if "all" is selected, show everything)
+                const matchesCategory = selectedCategory === 'all' || token.category === selectedCategory;
+                
                 return matchesSearch && matchesCategory;
             });
             
             renderTokens(filtered);
         }
 
-       function filterTokens() {
-    const search = document.getElementById('tokenSearch').value.toLowerCase();
-    
-    // Get checked categories
-    const checkedCategories = [];
-    if (document.getElementById('colorFilter').checked) checkedCategories.push('color');
-    if (document.getElementById('typographyFilter').checked) checkedCategories.push('typography');
-    if (document.getElementById('spacingFilter').checked) checkedCategories.push('spacing');
-    
-    const filtered = tokens.filter(token => {
-        // Check search match
-        const matchesSearch = token.name.toLowerCase().includes(search) || 
-                            (token.description && token.description.toLowerCase().includes(search));
-        
-        // Check category match (only if at least one category is selected)
-        const matchesCategory = checkedCategories.length === 0 || checkedCategories.includes(token.category);
-        
-        return matchesSearch && matchesCategory;
-    });
-    
-    renderTokens(filtered);
-}
-
-// searchTokens to use the same logic
-function searchTokens() {
-    filterTokens(); // Just call filterTokens since it handles both search and categories
-}
-
-// Add "Select All" / "Clear All" functionality
-function selectAllCategories() {
-    document.getElementById('colorFilter').checked = true;
-    document.getElementById('typographyFilter').checked = true;
-    document.getElementById('spacingFilter').checked = true;
-    filterTokens();
-}
-
-function clearAllCategories() {
-    document.getElementById('colorFilter').checked = false;
-    document.getElementById('typographyFilter').checked = false;
-    document.getElementById('spacingFilter').checked = false;
-    filterTokens();
-}function filterTokens() {
-    const search = document.getElementById('tokenSearch').value.toLowerCase();
-    
-    // Get checked categories
-    const checkedCategories = [];
-    if (document.getElementById('colorFilter').checked) checkedCategories.push('color');
-    if (document.getElementById('typographyFilter').checked) checkedCategories.push('typography');
-    if (document.getElementById('spacingFilter').checked) checkedCategories.push('spacing');
-    
-    const filtered = tokens.filter(token => {
-        // Check search match
-        const matchesSearch = token.name.toLowerCase().includes(search) || 
-                            (token.description && token.description.toLowerCase().includes(search));
-        
-        // Check category match (only if at least one category is selected)
-        const matchesCategory = checkedCategories.length === 0 || checkedCategories.includes(token.category);
-        
-        return matchesSearch && matchesCategory;
-    });
-    
-    renderTokens(filtered);
-}
-
-        // Update searchTokens to use the same logic
         function searchTokens() {
             filterTokens(); // Just call filterTokens since it handles both search and categories
-        }
-
-        // Optional: Add "Select All" / "Clear All" functionality
-        function selectAllCategories() {
-            document.getElementById('colorFilter').checked = true;
-            document.getElementById('typographyFilter').checked = true;
-            document.getElementById('spacingFilter').checked = true;
-            filterTokens();
-        }
-
-        function clearAllCategories() {
-            document.getElementById('colorFilter').checked = false;
-            document.getElementById('typographyFilter').checked = false;
-            document.getElementById('spacingFilter').checked = false;
-            filterTokens();
         }
 
         // Modal functions
@@ -935,7 +850,6 @@ function clearAllCategories() {
             hideError('tokenError');
         }
 
-
         // CRUD 
         async function handleTokenSubmit(e) {
             e.preventDefault();
@@ -952,18 +866,21 @@ function clearAllCategories() {
                 hideError('tokenError');
                 
                 if (form.dataset.editId) {
-                    await axios.put(`/api/tokens/${form.dataset.editId}`, data);
+                    // Mock edit
+                    const index = tokens.findIndex(t => t._id === form.dataset.editId);
+                    tokens[index] = { ...tokens[index], ...data };
                 } else {
-                    await axios.post('/api/tokens', data);
+                    // Mock create
+                    const newToken = { ...data, _id: Date.now().toString() };
+                    tokens.push(newToken);
                 }
                 
                 closeTokenModal();
-                loadData();
+                renderTokens(tokens);
             } catch (error) {
-                showError('tokenError', error.response?.data?.error || 'Failed to save token');
+                showError('tokenError', error.message || 'Failed to save token');
             }
         }
-
 
         function editToken(tokenId) {
             openTokenModal(tokenId);
@@ -973,8 +890,9 @@ function clearAllCategories() {
             if (!confirm('Delete this token?')) return;
             
             try {
-                await axios.delete(`/api/tokens/${tokenId}`);
-                loadData();
+                // Mock delete
+                tokens = tokens.filter(t => t._id !== tokenId);
+                renderTokens(tokens);
             } catch (error) {
                 alert('Failed to delete token');
             }
@@ -983,16 +901,12 @@ function clearAllCategories() {
         // export button
         async function exportTokensAsJSON() {
             try {
-            // Get all 
-            const response = await axios.get('/api/tokens?limit=1000');
-            const allTokens = response.data.tokens;
+                if (tokens.length === 0) {
+                    alert('No tokens to export');
+                    return;
+                }
             
-            if (allTokens.length === 0) {
-                alert('No tokens to export');
-                return;
-            }
-        
-                const exportTokens = allTokens.map(token => ({
+                const exportTokens = tokens.map(token => ({
                     name: token.name,
                     category: token.category,
                     value: token.value,
@@ -1008,7 +922,7 @@ function clearAllCategories() {
                 // Convert to JSON
                 const jsonString = JSON.stringify(exportData, null, 2);
                 
-                // download
+                // Create download
                 const blob = new Blob([jsonString], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
@@ -1118,31 +1032,45 @@ function clearAllCategories() {
                 document.getElementById('uploadBtn').disabled = true;
                 document.getElementById('uploadBtn').textContent = 'Uploading...';
 
-                const response = await axios.post('/api/tokens/upload', {
-                    tokens: selectedTokensData
+                // Mock upload process
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                let successCount = 0;
+                let skippedCount = 0;
+                let errorCount = 0;
+
+                selectedTokensData.forEach(tokenData => {
+                    try {
+                        // Check if token already exists
+                        const exists = tokens.some(t => t.name === tokenData.name);
+                        if (exists) {
+                            skippedCount++;
+                        } else {
+                            // Add new token
+                            const newToken = {
+                                _id: Date.now().toString() + Math.random(),
+                                name: tokenData.name,
+                                category: tokenData.category,
+                                value: tokenData.value,
+                                description: tokenData.description || ''
+                            };
+                            tokens.push(newToken);
+                            successCount++;
+                        }
+                    } catch (error) {
+                        errorCount++;
+                    }
                 });
 
-                const results = response.data.results;
-                
                 let message = `Upload complete!\n`;
-                message += `✅ ${results.success.length} tokens created\n`;
-                message += `⏭️ ${results.skipped.length} tokens skipped (already exist)\n`;
-                message += `❌ ${results.errors.length} errors`;
-
-                if (results.errors.length > 0) {
-                    message += `\n\nErrors:\n`;
-                    results.errors.slice(0, 3).forEach(error => {
-                        message += `• ${error.data.name || 'unnamed'}: ${error.error}\n`;
-                    });
-                    if (results.errors.length > 3) {
-                        message += `• ... and ${results.errors.length - 3} more errors`;
-                    }
-                }
+                message += `${successCount} tokens created\n`;
+                message += `${skippedCount} tokens skipped (already exist)\n`;
+                message += `${errorCount} errors`;
 
                 showSuccess('uploadSuccess', message);
                 
                 // Reload tokens to show new ones
-                await loadTokens();
+                renderTokens(tokens);
                 
                 // Close modal after a delay
                 setTimeout(() => {
@@ -1150,7 +1078,7 @@ function clearAllCategories() {
                 }, 3000);
 
             } catch (error) {
-                showError('uploadError', error.response?.data?.error || 'Upload failed');
+                showError('uploadError', error.message || 'Upload failed');
             } finally {
                 document.getElementById('uploadBtn').disabled = false;
                 document.getElementById('uploadBtn').textContent = 'Upload Tokens';
@@ -1162,6 +1090,8 @@ function clearAllCategories() {
             successEl.textContent = message;
             successEl.style.display = 'block';
         }
+
+        // Close modal when clicking outside
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('modal')) {
                 e.target.classList.remove('active');
