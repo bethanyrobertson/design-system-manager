@@ -19,7 +19,7 @@ app.use(express.static('public'));
 // Database connection with error handling
 const connectDB = async () => {
   try {
-    console.log('🔄 Attempting to connect to MongoDB...');
+    console.log('Attempting to connect to MongoDB...');
     
     await mongoose.connect(MONGODB_URI, {
       useNewUrlParser: true,
@@ -28,10 +28,10 @@ const connectDB = async () => {
       socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
     });
     
-    console.log('✅ Connected to MongoDB successfully');
+    console.log('Connected to MongoDB successfully');
   } catch (error) {
-    console.error('❌ MongoDB connection failed:', error.message);
-    console.log('⚠️  App will continue running without database');
+    console.error('MongoDB connection failed:', error.message);
+    console.log('App will continue running without database');
     // Don't exit process - continue without database
   }
 };
@@ -41,21 +41,21 @@ connectDB();
 
 // Enhanced connection event listeners
 mongoose.connection.on('connected', () => {
-  console.log('📊 Mongoose connected to MongoDB');
+  console.log('Mongoose connected to MongoDB');
 });
 
 mongoose.connection.on('error', (err) => {
-  console.error('❌ Mongoose connection error:', err.message);
+  console.error('Mongoose connection error:', err.message);
   // Don't crash the app on connection errors
 });
 
 mongoose.connection.on('disconnected', () => {
-  console.log('📴 Mongoose disconnected');
+  console.log('Mongoose disconnected');
 });
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
-  console.log('🔄 Shutting down gracefully...');
+  console.log('Shutting down gracefully...');
   try {
     await mongoose.connection.close();
   } catch (error) {
@@ -108,7 +108,7 @@ app.get('/api/test', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('💥 Error:', err.stack);
+  console.error('Error:', err.stack);
   res.status(500).json({ 
     error: 'Something went wrong!',
     message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
@@ -125,10 +125,10 @@ app.use('*', (req, res) => {
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Design System API running on port ${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🏠 Frontend available at http://localhost:${PORT}`);
-  console.log(`💾 Database: ${mongoose.connection.readyState === 1 ? 'Connected' : 'Connecting...'}`);
+  console.log(`Design System API running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Frontend available at http://localhost:${PORT}`);
+  console.log(`Database: ${mongoose.connection.readyState === 1 ? 'Connected' : 'Connecting...'}`);
 });
 
 module.exports = app;

@@ -128,6 +128,9 @@
 
         button:hover {
             background: #CCE6C8;
+            color:  #02514E;
+            border: 1px solid #02514E;
+
         }
 
         button:disabled {
@@ -286,7 +289,7 @@
             }
         }
 
-        /* ===== NEW TABLE STYLES ===== */
+        /* ===== TABLE STYLES ===== */
         .tokens-table-container {
             max-height: 600px;
             overflow-y: auto;
@@ -528,7 +531,7 @@
         <!-- Auth Screen -->
         <div id="authScreen">
             <div class="auth-container">
-                <h2 id="authTitle">Login</h2>
+                <h2 id="authTitle">Design Token Manager</h2>
                 <div id="authError" class="error" style="display: none;"></div>
                 <form id="authForm">
                     <div class="form-group" id="usernameGroup" style="display: none;">
@@ -574,11 +577,10 @@
 
                 <div class="section">
                     <div class="section-header">
-                        <h2>Design Tokens</h2>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button id="addTokenBtn" onclick="openTokenModal()" style="display: none;">+ Add Token</button>
+                            <button id="uploadTokenBtn" onclick="openUploadModal()" style="display: none;">Upload JSON</button>
                             <button onclick="exportTokensAsJSON()">Export JSON</button>
-                            <button onclick="openTokenModal()">+ Add Token</button>
-                            <button onclick="openUploadModal()">Upload JSON</button>
                         </div>
                     </div>
                      
@@ -610,7 +612,7 @@
                        </div>
                    </div>
 
-                    <!-- ===== UPDATED TABLE STRUCTURE ===== -->
+                    <!-- ===== TABLE STRUCTURE ===== -->
                     <div id="tokensList" class="tokens-table-container">
                         <div class="loading">Loading...</div>
                     </div>
@@ -619,7 +621,7 @@
             </div>
         </div>
 
-        <!-- Simple Token Modal -->
+        <!-- Token Modal -->
         <div id="tokenModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -725,16 +727,35 @@
             axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
         }
 
-        // Initialize
+     // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             setupEventListeners();
             if (authToken) {
-                showMainApp();
-                loadData();
+                // Verify token is still valid before showing main app
+                verifyAuthToken(); // ✅ Now verifies token first
             } else {
                 showAuthScreen();
             }
         });
+
+        // ===== NEW FUNCTION TO VERIFY TOKEN =====
+        async function verifyAuthToken() {
+            try {
+                // Try to make an authenticated request to verify the token
+                const response = await axios.get('/api/auth/verify');
+                currentUser = response.data.user;
+                showMainApp();
+                loadData();
+            } catch (error) {
+                console.log('Token verification failed:', error.response?.status);
+                // Token is invalid, clear it and show auth screen
+                localStorage.removeItem('authToken');
+                delete axios.defaults.headers.common['Authorization'];
+                authToken = null;
+                currentUser = null;
+                showAuthScreen();
+            }
+        }
 
         function setupEventListeners() {
             document.getElementById('authForm').addEventListener('submit', handleAuth);
@@ -800,6 +821,8 @@
             document.getElementById('mainApp').style.display = 'none';
         }
 
+  
+
         function showMainApp() {
             document.getElementById('authScreen').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
@@ -807,8 +830,44 @@
             if (currentUser) {
                 document.getElementById('userName').textContent = currentUser.username;
                 document.getElementById('userRole').textContent = currentUser.role;
+                
+                // Show/hide admin-only features
+                updateAdminFeatures();
             }
         }
+
+  
+        function isAdmin() {
+            return currentUser && currentUser.role === 'admin';
+        }
+
+        function updateAdminFeatures() {
+            const isUserAdmin = isAdmin();
+            
+            // add and upload buttons
+            document.getElementById('addTokenBtn').style.display = isUserAdmin ? 'inline-block' : 'none';
+            document.getElementById('uploadTokenBtn').style.display = isUserAdmin ? 'inline-block' : 'none';
+            
+            // access level indicator
+            const accessLevel = document.getElementById('accessLevel');
+            if (accessLevel) {
+                accessLevel.textContent = isUserAdmin ? '(Admin Access)' : '(View Only)';
+                accessLevel.style.color = isUserAdmin ? '#38a169' : '#999';
+            }
+            
+            if (tokens.length > 0) {
+                renderTokens(tokens);
+            }
+        }
+
+        function checkAdminPermission(action) {
+            if (!isAdmin()) {
+                alert(`Access denied. Only administrators can ${action}.`);
+                return false;
+            }
+            return true;
+        }
+
 
         function showError(elementId, message) {
             const errorEl = document.getElementById(elementId);
@@ -831,15 +890,21 @@
                 tokens = response.data.tokens;
                 renderTokens(tokens);
             } catch (error) {
+                // Check if it's an authentication error
+                if (error.response?.status === 401 || error.response?.status === 403) {
+                    console.log('Authentication failed, redirecting to login');
+                    logout(); // This will clear token and show auth screen
+                    return;
+                }
                 document.getElementById('tokensList').innerHTML = '<div class="error">Failed to load tokens</div>';
             }
         }
 
         async function loadComponents() {
-            // Implementation for components if needed
+            // Implementation for components 
         }
 
-        // ===== UPDATED RENDERING FUNCTION =====
+        
         function renderTokens(tokensToRender) {
             const container = document.getElementById('tokensList');
             
@@ -886,8 +951,12 @@
                                 </td>
                                 <td>
                                     <div class="token-actions">
-                                        <button onclick="editToken('${token._id}')" class="btn-secondary btn-small">Edit</button>
-                                        <button onclick="deleteToken('${token._id}')" class="btn-danger btn-small">Delete</button>
+                                        ${isAdmin() ? `
+                                        <div class="token-actions">
+                                            <button onclick="editToken()">Edit</button>
+                                            <button onclick="deleteToken()">Delete</button>
+                                        </div>
+                                    ` : '<span class="view-only-badge">View only</span>'}
                                     </div>
                                 </td>
                             </tr>
@@ -978,7 +1047,6 @@
                 document.body.removeChild(textArea);
             }
         }
-        // ===== END NEW FUNCTIONS =====
 
         // Search and filter 
         function filterTokens() {
@@ -1005,8 +1073,12 @@
             filterTokens(); // Just call filterTokens since it handles both search and categories
         }
 
-        // Modal functions
+     // Modal functions
         function openTokenModal(tokenId = null) {
+            if (!checkAdminPermission('add or edit tokens')) {
+                return;
+            }
+            
             const modal = document.getElementById('tokenModal');
             const form = document.getElementById('tokenForm');
             
@@ -1061,10 +1133,18 @@
         }
 
         function editToken(tokenId) {
+            if (!checkAdminPermission('edit tokens')) {
+                return;
+            }
             openTokenModal(tokenId);
         }
 
+
         async function deleteToken(tokenId) {
+            if (!checkAdminPermission('delete tokens')) {
+                return;
+            }
+            
             if (!confirm('Delete this token?')) return;
             
             try {
@@ -1122,8 +1202,11 @@
             }
         } 
 
-        // Upload
+       // Upload
         function openUploadModal() {
+            if (!checkAdminPermission('upload tokens')) {
+                return;
+            }
             document.getElementById('uploadModal').classList.add('active');
             resetUploadModal();
         }

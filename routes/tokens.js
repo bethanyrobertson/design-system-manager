@@ -2,7 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const DesignToken = require('../models/DesignToken');
-const { authenticateToken } = require('../middleware/auth');
+const { authenticateToken, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -76,7 +76,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 });
 
 // Create token
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, requireRole(['admin']), async (req, res) => {
   try {
     const { name, category, value, description, tags } = req.body;
 
@@ -118,7 +118,7 @@ router.post('/', authenticateToken, async (req, res) => {
 });
 
 // Bulk upload tokens from JSON
-router.post('/upload', authenticateToken, async (req, res) => {
+router.post('/upload', authenticateToken, requireRole(['admin']), async (req, res) => {
   try {
     const { tokens } = req.body;
 
@@ -196,7 +196,7 @@ router.post('/upload', authenticateToken, async (req, res) => {
 });
 
 // Update token
-router.put('/:id', authenticateToken, async (req, res) => {
+router.put('/:id', authenticateToken, requireRole(['admin']), async (req, res) => {
   try {
     // Validate ObjectId format
     if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -235,7 +235,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
 });
 
 // Delete token
-router.delete('/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', authenticateToken, requireRole(['admin']), async (req, res) => {
   try {
     // Validate ObjectId format
     if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {

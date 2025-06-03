@@ -39,7 +39,7 @@ router.post('/register', async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    console.log('✅ User registered successfully:', email);
+    console.log('User registered successfully:', email);
     res.status(201).json({
       message: 'User created successfully',
       token,
@@ -66,7 +66,7 @@ router.post('/login', async (req, res) => {
     }
 
     // DEBUG: Check what we got from database
-    console.log('✅ Test user login successful:', email);
+    console.log('Test user login successful:', email);
     console.log('DEBUG - Database user._id:', user._id);
     console.log('DEBUG - typeof user._id:', typeof user._id);
     console.log('DEBUG - user object:', user);
@@ -129,7 +129,38 @@ router.get('/me', async (req, res) => {
   }
 });
 
-// Test endpoint
+router.get('/verify', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    
+    // Try to get user from database
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    res.json({
+      user: { 
+        _id: user._id, 
+        username: user.username, 
+        email: user.email, 
+        role: user.role 
+      }
+    });
+  } catch (error) {
+    console.error('Token verification error:', error);
+    res.status(403).json({ error: 'Invalid or expired token' });
+  }
+});
+
+// Test
 router.get('/test', (req, res) => {
   res.json({
     message: 'Auth routes are working!',
