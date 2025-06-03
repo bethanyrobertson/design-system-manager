@@ -616,7 +616,7 @@
                     <div id="tokensList" class="tokens-table-container">
                         <div class="loading">Loading...</div>
                     </div>
-                    <!-- ===== END UPDATED TABLE STRUCTURE ===== -->
+                   
                 </div>
             </div>
         </div>
@@ -738,7 +738,6 @@
             }
         });
 
-        // ===== NEW FUNCTION TO VERIFY TOKEN =====
         async function verifyAuthToken() {
             try {
                 // Try to make an authenticated request to verify the token
@@ -953,8 +952,8 @@
                                     <div class="token-actions">
                                         ${isAdmin() ? `
                                         <div class="token-actions">
-                                            <button onclick="editToken()">Edit</button>
-                                            <button onclick="deleteToken()">Delete</button>
+                                            <button onclick="editToken('${token._id}')">Edit</button>
+                                            <button onclick="deleteToken('${token._id}')">Delete</button>
                                         </div>
                                     ` : '<span class="view-only-badge">View only</span>'}
                                     </div>
