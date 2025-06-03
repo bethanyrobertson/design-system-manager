@@ -1,4 +1,3 @@
-// tests/tokens.test.js - Design Token Tests
 const request = require('supertest');
 const express = require('express');
 const jwt = require('jsonwebtoken');
@@ -20,7 +19,7 @@ describe('Design Token Routes', () => {
   let adminToken;
 
   beforeEach(async () => {
-    // Create test user
+    // test user
     testUser = new User({
       username: 'testuser',
       email: 'test@example.com',
@@ -29,7 +28,7 @@ describe('Design Token Routes', () => {
     });
     await testUser.save();
 
-    // Create admin user
+    // admin user
     adminUser = new User({
       username: 'admin',
       email: 'admin@example.com',
@@ -38,7 +37,7 @@ describe('Design Token Routes', () => {
     });
     await adminUser.save();
 
-    // Generate auth tokens
+    // auth tokens
     authToken = jwt.sign(
       { id: testUser._id, username: testUser.username, role: testUser.role },
       JWT_SECRET,
@@ -53,7 +52,7 @@ describe('Design Token Routes', () => {
   });
 
   describe('POST /api/tokens', () => {
-    test('should create a new design token', async () => {
+    test('should create a new design token as admin', async () => {
       const tokenData = {
         name: 'primary-blue',
         category: 'color',
@@ -64,7 +63,7 @@ describe('Design Token Routes', () => {
 
       const response = await request(app)
         .post('/api/tokens')
-        .set('Authorization', `Bearer ${authToken}`)
+        .set('Authorization', `Bearer ${adminToken}`)
         .send(tokenData)
         .expect(201);
 
@@ -73,7 +72,7 @@ describe('Design Token Routes', () => {
       expect(response.body).toHaveProperty('value', '#3B82F6');
       expect(response.body).toHaveProperty('description', 'Primary brand color');
       expect(response.body.tags).toEqual(['primary', 'brand']);
-      expect(response.body.createdBy).toHaveProperty('username', 'testuser');
+      expect(response.body.createdBy).toHaveProperty('username', 'admin');
 
       // Verify token was created in database
       const token = await DesignToken.findOne({ name: 'primary-blue' });
@@ -88,14 +87,14 @@ describe('Design Token Routes', () => {
 
       const response = await request(app)
         .post('/api/tokens')
-        .set('Authorization', `Bearer ${authToken}`)
+        .set('Authorization', `Bearer ${adminToken}`)
         .send(tokenData)
         .expect(400);
 
       expect(response.body).toHaveProperty('error', 'Name, category, and value are required');
     });
 
-    test('should not create token without authentication', async () => {
+    test('should not create token without admin role', async () => {
       const tokenData = {
         name: 'primary-blue',
         category: 'color',
@@ -104,10 +103,10 @@ describe('Design Token Routes', () => {
 
       const response = await request(app)
         .post('/api/tokens')
-        .send(tokenData)
-        .expect(401);
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(403);
 
-      expect(response.body).toHaveProperty('error', 'Access token required');
+      expect(response.body).toHaveProperty('error', 'Insufficient permissions');
     });
 
     test('should create token with empty tags array if not provided', async () => {
@@ -119,7 +118,7 @@ describe('Design Token Routes', () => {
 
       const response = await request(app)
         .post('/api/tokens')
-        .set('Authorization', `Bearer ${authToken}`)
+        .set('Authorization', `Bearer ${adminToken}`)
         .send(tokenData)
         .expect(201);
 
@@ -329,6 +328,7 @@ describe('Design Token Routes', () => {
     let testToken;
 
     beforeEach(async () => {
+      // Create a test token
       testToken = new DesignToken({
         name: 'test-token',
         category: 'color',
@@ -339,19 +339,6 @@ describe('Design Token Routes', () => {
       await testToken.save();
     });
 
-    test('should delete own token', async () => {
-      const response = await request(app)
-        .delete(`/api/tokens/${testToken._id}`)
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(200);
-
-      expect(response.body).toHaveProperty('message', 'Design token deleted successfully');
-
-      // Verify token was deleted
-      const deletedToken = await DesignToken.findById(testToken._id);
-      expect(deletedToken).toBeNull();
-    });
-
     test('should allow admin to delete any token', async () => {
       const response = await request(app)
         .delete(`/api/tokens/${testToken._id}`)
@@ -359,16 +346,50 @@ describe('Design Token Routes', () => {
         .expect(200);
 
       expect(response.body).toHaveProperty('message', 'Design token deleted successfully');
+
+      // token was deleted from database
+      const deletedToken = await DesignToken.findById(testToken._id);
+      expect(deletedToken).toBeNull();
+    });
+
+    test('should not allow non-admin to delete token', async () => {
+      const response = await request(app)
+        .delete(`/api/tokens/${testToken._id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(403);
+
+      expect(response.body).toHaveProperty('error', 'Insufficient permissions');
+
+      //token still exists in database
+      const existingToken = await DesignToken.findById(testToken._id);
+      expect(existingToken).toBeTruthy();
     });
 
     test('should return 404 for non-existent token', async () => {
-      const fakeId = '64a1b2c3d4e5f6789012345a';
+      const fakeId = '507f1f77bcf86cd799439011'; 
       const response = await request(app)
         .delete(`/api/tokens/${fakeId}`)
-        .set('Authorization', `Bearer ${authToken}`)
+        .set('Authorization', `Bearer ${adminToken}`)
         .expect(404);
 
       expect(response.body).toHaveProperty('error', 'Design token not found');
+    });
+
+    test('should return 400 for invalid token ID format', async () => {
+      const response = await request(app)
+        .delete('/api/tokens/invalid-id')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(400);
+
+      expect(response.body).toHaveProperty('error', 'Invalid token ID format');
+    });
+
+    test('should require authentication to delete token', async () => {
+      const response = await request(app)
+        .delete(`/api/tokens/${testToken._id}`)
+        .expect(401);
+
+      expect(response.body).toHaveProperty('error', 'Access token required');
     });
   });
 });

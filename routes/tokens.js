@@ -1,4 +1,3 @@
-// routes/tokens.js
 const express = require('express');
 const mongoose = require('mongoose');
 const DesignToken = require('../models/DesignToken');
@@ -84,11 +83,6 @@ router.post('/', authenticateToken, requireRole(['admin']), async (req, res) => 
       return res.status(400).json({ error: 'Name, category, and value are required' });
     }
 
-    // DEBUG: Log the user object to see what's wrong
-    console.log('DEBUG - req.user:', req.user);
-    console.log('DEBUG - req.user.id:', req.user.id);
-    console.log('DEBUG - typeof req.user.id:', typeof req.user.id);
-
     // Validate that we have a proper ObjectId
     let userId;
     if (mongoose.Types.ObjectId.isValid(req.user.id)) {
@@ -157,16 +151,6 @@ router.post('/upload', authenticateToken, requireRole(['admin']), async (req, re
           continue;
         }
 
-        // Validate user ID
-        if (!mongoose.Types.ObjectId.isValid(req.user.id)) {
-          results.errors.push({
-            index: i,
-            data: tokenData,
-            error: 'Invalid user ID'
-          });
-          continue;
-        }
-
         // Create new token
         const token = new DesignToken({
           name: tokenData.name,
@@ -205,9 +189,8 @@ router.post('/upload', authenticateToken, requireRole(['admin']), async (req, re
   }
 });
 
-
 // Update token
-router.put('/:id', authenticateToken, requireRole(['admin']), async (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
   try {
     // Validate ObjectId format
     if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -221,7 +204,7 @@ router.put('/:id', authenticateToken, requireRole(['admin']), async (req, res) =
       return res.status(404).json({ error: 'Design token not found' });
     }
 
-    // Check ownership or admin role
+    // check ownership or admin role
     if (token.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ error: 'Permission denied' });
     }
@@ -245,10 +228,9 @@ router.put('/:id', authenticateToken, requireRole(['admin']), async (req, res) =
   }
 });
 
-// Delete token
+//  token
 router.delete('/:id', authenticateToken, requireRole(['admin']), async (req, res) => {
   try {
-    // Validate ObjectId format
     if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).json({ error: 'Invalid token ID format' });
     }
@@ -256,11 +238,6 @@ router.delete('/:id', authenticateToken, requireRole(['admin']), async (req, res
     const token = await DesignToken.findById(req.params.id);
     if (!token) {
       return res.status(404).json({ error: 'Design token not found' });
-    }
-
-    // Check ownership or admin role
-    if (token.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({ error: 'Permission denied' });
     }
 
     await DesignToken.findByIdAndDelete(req.params.id);
