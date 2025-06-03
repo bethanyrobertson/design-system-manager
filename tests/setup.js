@@ -3,19 +3,17 @@ const mongoose = require('mongoose');
 
 let mongod;
 
-// Setup before all tests
+// Setup 
 beforeAll(async () => {
-  // Start in-memory MongoDB instance
+  
   mongod = await MongoMemoryServer.create();
   const uri = mongod.getUri();
   
-  // Connect mongoose to the in-memory database
   await mongoose.connect(uri);
 });
 
-// Cleanup after each test
+// Cleanup 
 afterEach(async () => {
-  // Clear all collections
   const collections = mongoose.connection.collections;
   for (const key in collections) {
     const collection = collections[key];
@@ -23,9 +21,8 @@ afterEach(async () => {
   }
 });
 
-// Cleanup after all tests
+// Cleanup 
 afterAll(async () => {
-  // Close mongoose connection
   await mongoose.connection.dropDatabase();
   await mongoose.connection.close();
   
@@ -33,5 +30,5 @@ afterAll(async () => {
   await mongod.stop();
 });
 
-// Increase timeout for database operations
+
 jest.setTimeout(30000);

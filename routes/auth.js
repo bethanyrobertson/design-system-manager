@@ -111,19 +111,14 @@ router.get('/me', async (req, res) => {
     const decoded = jwt.verify(token, JWT_SECRET);
     
     // Try to get user from database
-    try {
-      const user = await User.findById(decoded.id);
-      if (user) {
-        return res.json({
-          user: { id: user._id, username: user.username, email: user.email, role: user.role }
-        });
-      }
-    } catch (dbError) {
-      console.log('Database error in /me route:', dbError.message);
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
     }
 
-    // Fallback to token data
-    res.json({ user: decoded });
+    res.json({
+      user: { id: user._id, username: user.username, email: user.email, role: user.role }
+    });
   } catch (error) {
     res.status(403).json({ error: 'Invalid token' });
   }

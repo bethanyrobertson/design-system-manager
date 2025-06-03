@@ -157,6 +157,16 @@ router.post('/upload', authenticateToken, requireRole(['admin']), async (req, re
           continue;
         }
 
+        // Validate user ID
+        if (!mongoose.Types.ObjectId.isValid(req.user.id)) {
+          results.errors.push({
+            index: i,
+            data: tokenData,
+            error: 'Invalid user ID'
+          });
+          continue;
+        }
+
         // Create new token
         const token = new DesignToken({
           name: tokenData.name,
@@ -194,6 +204,7 @@ router.post('/upload', authenticateToken, requireRole(['admin']), async (req, re
     res.status(500).json({ error: error.message });
   }
 });
+
 
 // Update token
 router.put('/:id', authenticateToken, requireRole(['admin']), async (req, res) => {

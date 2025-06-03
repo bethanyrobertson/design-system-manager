@@ -64,7 +64,7 @@ describe('Authentication Routes', () => {
         .send(userData)
         .expect(201);
 
-      // Try to create second user with same email
+      // second user with same email
       const duplicateData = {
         username: 'testuser2',
         email: 'test@example.com',
@@ -80,7 +80,7 @@ describe('Authentication Routes', () => {
     });
 
     test('should not register user with duplicate username', async () => {
-      // Create first user
+      // first user
       const userData = {
         username: 'testuser',
         email: 'test1@example.com',
@@ -92,7 +92,7 @@ describe('Authentication Routes', () => {
         .send(userData)
         .expect(201);
 
-      // Try to create second user with same username
+      // second user with same username
       const duplicateData = {
         username: 'testuser',
         email: 'test2@example.com',
@@ -267,7 +267,7 @@ describe('Authentication Routes', () => {
 
       expect(response.body.token).toBeTruthy();
       expect(typeof response.body.token).toBe('string');
-      expect(response.body.token.split('.')).toHaveLength(3); // JWT has 3 parts
+      expect(response.body.token.split('.')).toHaveLength(3); 
     });
   });
 });
