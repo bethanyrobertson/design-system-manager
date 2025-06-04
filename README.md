@@ -4,6 +4,35 @@
 
 <img width="973" alt="Screenshot 2025-06-03 at 10 19 12 PM" src="https://github.com/user-attachments/assets/70832988-ff8d-4e6f-9d38-36eb60981368" />
 
+** **Key Workflows** **<br/>
+Token Management:<br/>
+Admin can create/edit/delete tokens<br/>
+Non-admin users can view tokens<br/>
+
+** **Authentication Flow** **<br/>
+User logs in/registers<br/>
+JWT token is generated<br/>
+Role-based permissions are checked<br/>
+
+** **Search & Filter** **<br/>
+Frontend: Real-time filtering of displayed tokens<br/>
+Backend: MongoDB text search<br/>
+Filter by category<br/>
+
+** **Data Import/Export** **<br/>
+JSON file upload with validation<br/>
+Export current tokens to JSON<br/>
+
+** **Core Routes** **<br/>
+Token API Endpoints<br/>
+GET /api/tokens (list tokens with filtering)<br/>
+GET /api/tokens/:id (get single token)<br/>
+POST /api/tokens (create token)<br/>
+PUT /api/tokens/:id (update token)<br/>
+DELETE /api/tokens/:id (delete token)<br/>
+POST /api/tokens/upload (bulk upload)<br/>
+
+
 ** **File Structure** **<br/>
 design-system-api/<br/>
 │── middleware/<br/>
@@ -26,33 +55,7 @@ design-system-api/<br/>
 └── server.js<br/> 
 
 
-** **Key Workflows** **
-Token Management:
-Admin can create/edit/delete tokens
-Non-admin users can view tokens
 
-** **Authentication Flow** **
-User logs in/registers
-JWT token is generated
-Role-based permissions are checked
-
-** **Search & Filter** **
-Frontend: Real-time filtering of displayed tokens
-Backend: MongoDB text search 
-Filter by category
-
-** **Data Import/Export** **
-JSON file upload with validation
-Export current tokens to JSON
-
-** **Core Routes** **
-Token API Endpoints
-GET /api/tokens (list tokens with filtering)
-GET /api/tokens/:id (get single token)
-POST /api/tokens (create token)
-PUT /api/tokens/:id (update token)
-DELETE /api/tokens/:id (delete token)
-POST /api/tokens/upload (bulk upload)
 
 
 https://github.com/user-attachments/assets/3cc80af7-f3e2-482a-baa0-5982fa49215f
