@@ -1,3 +1,9 @@
+# Deployed app: (https://design-system-manager-production-afd0.up.railway.app/)
+## Email: admin@example.com
+## Password: admin123
+
+<img width="973" alt="Screenshot 2025-06-03 at 10 19 12 PM" src="https://github.com/user-attachments/assets/70832988-ff8d-4e6f-9d38-36eb60981368" />
+
 ** **File Structure** **<br/>
 design-system-api/<br/>
 │── middleware/<br/>
@@ -18,6 +24,41 @@ design-system-api/<br/>
 ├── .gitignore<br/>      
 ├── package.json<br/>  
 └── server.js<br/> 
+
+
+** **Key Workflows** **
+Token Management:
+Admin can create/edit/delete tokens
+Non-admin users can view tokens
+
+** **Authentication Flow** **
+User logs in/registers
+JWT token is generated
+Role-based permissions are checked
+
+** **Search & Filter** **
+Frontend: Real-time filtering of displayed tokens
+Backend: MongoDB text search 
+Filter by category
+
+** **Data Import/Export** **
+JSON file upload with validation
+Export current tokens to JSON
+
+** **Core Routes** **
+Token API Endpoints
+GET /api/tokens (list tokens with filtering)
+GET /api/tokens/:id (get single token)
+POST /api/tokens (create token)
+PUT /api/tokens/:id (update token)
+DELETE /api/tokens/:id (delete token)
+POST /api/tokens/upload (bulk upload)
+
+
+https://github.com/user-attachments/assets/3cc80af7-f3e2-482a-baa0-5982fa49215f
+
+
+
 
 ## 1. A description of the scenario your project is operating in.<br/>
 
