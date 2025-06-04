@@ -12,8 +12,8 @@ Authentication & Authorization:<br/>
 • We covered this a lot in class<br/>
 
 Deployment & Storage<br/>
-• Deploying via Railway was intuitive and the logs were really helpful in debugging<br/>
-• MongoDB setup and connection
+• Deploying via Railway was intuitive, and the logs were invaluable in debugging<br/>
+• MongoDB setup and connection<br/>
 
 ### What Didn't Go Well<br/>
 Error Handling:<br/>
@@ -27,20 +27,20 @@ Code Organization:<br/>
 
 
 ### What I Learned<br/>
-• Connecting front end to back end
-• Database Management with MongoDB
+• Connecting front end to back end<br/>
+• Database management with MongoDB<br/>
 
 
 -----
 ## Documentation<br/>
 
-design-system-manager/
-├── public/              # Static files
-├── routes/             # API routes
-├── models/             # Database models
-├── middleware/         # Custom middleware
-├── tests/              # Test files
-└── server.js          # Main application file
+design-system-manager/<br/>
+├── public/              # Static files<br/>
+├── routes/             # API routes<br/>
+├── models/             # Database models<br/>
+├── middleware/         # Custom middleware<br/>
+├── tests/              # Test files<br/>
+└── server.js          # Main application file<br/>
 
 
 ** **Key Workflows** **<br/>
@@ -76,25 +76,30 @@ POST /api/tokens/upload (bulk upload)<br/>
 • Text search<br/>
 • Sorting<br/>
 • Authentication required<br/>
+
 ** **GET /api/tokens/:id:** **<br/>
 • ID validation<br/>
 • Token existence check<br/>
 • Authentication required<br/>
+
 ** **POST /api/tokens:** **<br/>
 • Admin role required<br/>
 • Required field validation<br/>
 • Duplicate name check<br/>
 • Authentication required<br/>
+
 ** **PUT /api/tokens/:id:** **<br/>
 • Creator or admin access<br/>
 • ID validation<br/>
 • Token existence check<br/>
 • Authentication required<br/>
+
 ** **DELETE /api/tokens/:id:** **<br/>
 • Admin role required<br/>
 • ID validation<br/>
 • Token existence check<br/>
 • Authentication required<br/>
+
 ** **POST /api/tokens/upload:** **<br/>
 • Admin role required<br/>
 • JSON validation<br/>
